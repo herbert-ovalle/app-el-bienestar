@@ -14,7 +14,7 @@ class ProductosScreen extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            Image(image: AssetImage("assets/LOGO_AZUL.png"), height: 70,)
+            Image(image: AssetImage("assets/LOGO_AZUL.png"), height: 50,)
           ],
         ),
       ),

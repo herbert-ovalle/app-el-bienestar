@@ -7,14 +7,6 @@ class HomeBienestar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    /*List<String> lstSubTitulos = [
-      "¡Descubre lo que tus ahorros pueden hacer por ti!",
-      "¡Construye tu futuro con confianza y facilidad!",
-      "¡Protección en cada momento!",
-      "¡Bienestar para tu familia!",
-      "¡Llegó la oportunidad para tener casa propia! Invierte ahora en lotificación Miralbosque En Pachaj Cantel, Quetzaltenango"
-    ];*/
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -49,7 +41,8 @@ class HomeBienestar extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.shopping_bag, color: Colors.blue.shade700, size: 24), // Icono decorativo
+                Icon(Icons.shopping_bag,
+                    color: Colors.blue.shade700, size: 24), // Icono decorativo
                 const SizedBox(width: 8),
                 Text(
                   "Mis Productos",
@@ -62,7 +55,8 @@ class HomeBienestar extends StatelessWidget {
                           Colors.blue.shade600,
                           Colors.blue.shade400,
                         ],
-                      ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)), // Gradiente en el texto
+                      ).createShader(Rect.fromLTWH(
+                          0.0, 0.0, 200.0, 70.0)), // Gradiente en el texto
                   ),
                 ),
               ],
@@ -72,33 +66,62 @@ class HomeBienestar extends StatelessWidget {
         _MisProductosBie(),
         Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Text("Tasa de Cambio:  7.60"),
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            decoration: BoxDecoration(
+              color: Colors.green.shade100, // Fondo suave para destacar
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  // ignore: deprecated_member_use
+                  color: Colors.green.shade300.withOpacity(0.5),
+                  blurRadius: 8,
+                  offset: Offset(0, 4), // Sombra para destacar
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.monetization_on_outlined,
+                  color: Colors.green.shade700, // Ícono representativo
+                  size: 28,
+                ),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Tasa de Cambio",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color:
+                            Colors.green.shade700, // Texto principal llamativo
+                      ),
+                    ),
+                    Text(
+                      "7.60",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade900, // Valor destacado
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 20,
         ),
         Expanded(
           child: SingleChildScrollView(
             child: Column(children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _OpcionDos(),
-                  _OpcionDos(),
-                  _OpcionDos(),
-                  _OpcionDos(),
-                ],
-              ),
-              SizedBox(height: 10),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _OpcionDos(),
-                  _OpcionDos(),
-                  _OpcionDos(),
-                  _OpcionDos()
-                ],
-              ),
-              SizedBox(height: 10),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -118,13 +141,11 @@ class HomeBienestar extends StatelessWidget {
 }
 
 class _MisProductosBie extends StatefulWidget {
-
   @override
   State<_MisProductosBie> createState() => _MisProductosBieState();
 }
 
 class _MisProductosBieState extends State<_MisProductosBie> {
-
   final ScrollController _scrollController = ScrollController();
   bool _isAtStart = true; // Indica si estamos al inicio
   bool _isAtEnd = false; // Indica si estamos al final
@@ -144,13 +165,27 @@ class _MisProductosBieState extends State<_MisProductosBie> {
     });
   }
 
-
   void _scrollToEnd() {
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent, // Posición final
       duration: const Duration(milliseconds: 500), // Duración de la animación
       curve: Curves.easeInOut, // Curva de la animación
     );
+  }
+
+  void _scrollToStart() {
+    _scrollController.animateTo(
+      _scrollController.position.minScrollExtent,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener); // Eliminar el listener
+    _scrollController.dispose(); // Limpiar el controlador
+    super.dispose();
   }
 
   @override
@@ -164,73 +199,178 @@ class _MisProductosBieState extends State<_MisProductosBie> {
             children: [
               _IconosProducto(titulo: "Ahorros", icono: Icons.savings),
               _IconosProducto(
-                  titulo: "Préstamos",
-                  icono: Icons.real_estate_agent_outlined),
+                  titulo: "Préstamos", icono: Icons.real_estate_agent_outlined),
               _IconosProducto(
                   titulo: "Seguros", icono: Icons.account_balance_outlined),
               _IconosProducto(
                   titulo: "Remesas", icono: Icons.monetization_on_outlined),
               _IconosProducto(
-                  titulo: "Propiedades en Venta",
-                  icono: Icons.house_outlined),
+                  titulo: "Propiedades en Venta", icono: Icons.house_outlined),
             ],
           ),
         ),
-        Positioned.fill(
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              width: 58,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    Colors.transparent,
-                    // ignore: deprecated_member_use
-                    Colors.white.withOpacity(0.4)
-                  ],
+        if (!_isAtEnd)
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                width: 58,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Colors.transparent,
+                      // ignore: deprecated_member_use
+                      Colors.white.withOpacity(0.5)
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        Positioned(
-          right: 10,
-          top: 40,
-          child: GestureDetector(
-            onTap: _scrollToEnd,
-            child: Icon(
-              Icons.arrow_forward,
-              color: Colors.white,
-              size: 48,
+        if (!_isAtEnd)
+          Positioned(
+            right: 10,
+            top: 40,
+            child: GestureDetector(
+              onTap: _scrollToEnd,
+              child: Icon(
+                Icons.arrow_forward,
+                color: Colors.white,
+                size: 48,
+              ),
             ),
           ),
-        ),
+        if (!_isAtStart)
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                width: 58,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft,
+                    colors: [
+                      Colors.transparent,
+                      // ignore: deprecated_member_use
+                      Colors.white.withOpacity(0.5),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        if (!_isAtStart)
+          Positioned(
+            left: 10,
+            top: 40,
+            child: GestureDetector(
+              onTap: _scrollToStart,
+              child: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+                size: 48,
+              ),
+            ),
+          ),
       ],
     );
   }
 }
 
-class _OpcionDos extends StatelessWidget {
+/*class _OpcionDos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Container(
-        height: 75,
-        width: 70,
-        decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: CircleAvatar(
+        maxRadius: 40,
+        backgroundColor: Colors.white, // Fondo blanco para el círculo,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.monetization_on_outlined,
+              size: 48,
+              color: const Color.fromARGB(255, 2, 4, 114), // Ícono blanco
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "Dólares",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 8,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue, // Texto blanco
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}*/
+class _OpcionDos extends StatefulWidget {
+  @override
+  State<_OpcionDos> createState() => _OpcionDosState();
+}
+
+class _OpcionDosState extends State<_OpcionDos> {
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) {
+        debugPrint("onTapDown");
+      }, // Cambia estado al tocar
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+                  colors: [Colors.blue.shade400, Colors.blue.shade600],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+          boxShadow:[
+                  BoxShadow(
+                    // ignore: deprecated_member_use
+                    color: Colors.green.shade200.withOpacity(0.4),
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  )]
+              
+        ),
+        child: CircleAvatar(
+          maxRadius: 40,
+          backgroundColor:
+              Colors.transparent, // Fondo transparente para gradiente
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.monetization_on_outlined, size: 44),
-              SizedBox(height: 5),
-              Text("Dólares",
-                  textAlign: TextAlign.center, style: TextStyle(fontSize: 8))
-            ]),
+              Icon(
+                Icons.monetization_on_outlined,
+                size: 48,
+                color: Colors.white, // Ícono blanco
+              ),
+              Text(
+                "Dólares",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white, // Texto blanco
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -247,7 +387,6 @@ class _IconosProducto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.only(right: 5, left: 5),
       child: GestureDetector(
@@ -312,6 +451,5 @@ class _IconosProducto extends StatelessWidget {
         ),
       ),
     );
-
   }
 }
