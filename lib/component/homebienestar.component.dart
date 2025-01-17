@@ -1,6 +1,7 @@
 import 'package:app_bienestar/component/pageview.component.dart';
 import 'package:app_bienestar/component/productos.component.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 class HomeBienestar extends StatelessWidget {
   const HomeBienestar({super.key});
@@ -82,55 +83,79 @@ class HomeBienestar extends StatelessWidget {
               ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(
-                  Icons.monetization_on_outlined,
-                  color: Colors.green.shade700, // Ícono representativo
-                  size: 28,
-                ),
-                const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      "Tasa de Cambio",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color:
-                            Colors.green.shade700, // Texto principal llamativo
-                      ),
+                    Icon(
+                      Icons.monetization_on_outlined,
+                      color: Colors.green.shade700, // Ícono representativo
+                      size: 30,
                     ),
-                    Text(
-                      "7.60",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green.shade900, // Valor destacado
-                      ),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Tasa de Cambio:",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors
+                                .green.shade700, // Texto principal llamativo
+                          ),
+                        ),
+                        Text(
+                          "7.60",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green.shade900, // Valor destacado
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
+                _CurrentDateTimeWidget()
               ],
             ),
           ),
         ),
         SizedBox(
-          height: 20,
+          height: 10,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: Text("Aplicaciones"),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 5,
         ),
         Expanded(
           child: SingleChildScrollView(
             child: Column(children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _OpcionDos(),
-                  _OpcionDos(),
-                  _OpcionDos(),
-                  _OpcionDos()
-                ],
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _OpcionDos(icono: Icons.person, titulo: "Registro"),
+                    _OpcionDos(icono: Icons.house, titulo: "Hogar"),
+                    _OpcionDos(icono: Icons.monetization_on, titulo: "Finanzas"),
+                    _OpcionDos(icono: Icons.money_rounded, titulo: "Presupuesto"),
+                    _OpcionDos(
+                        icono: Icons.monitor_heart_outlined, titulo: "Noticias")
+                  ],
+                ),
               )
             ]),
           ),
@@ -280,72 +305,75 @@ class _MisProductosBieState extends State<_MisProductosBie> {
   }
 }
 
-/*class _OpcionDos extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: CircleAvatar(
-        maxRadius: 40,
-        backgroundColor: Colors.white, // Fondo blanco para el círculo,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.monetization_on_outlined,
-              size: 48,
-              color: const Color.fromARGB(255, 2, 4, 114), // Ícono blanco
-            ),
-            const SizedBox(height: 4),
-            Text(
-              "Dólares",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 8,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue, // Texto blanco
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}*/
 class _OpcionDos extends StatefulWidget {
+  final IconData icono;
+  final String titulo;
+
+  const _OpcionDos({required this.icono, required this.titulo});
+
   @override
   State<_OpcionDos> createState() => _OpcionDosState();
 }
 
 class _OpcionDosState extends State<_OpcionDos> {
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (_) {
         debugPrint("onTapDown");
+        showModalBottomSheet<void>(
+          context: context,
+          builder: (BuildContext context) {
+            final espacio = MediaQuery.of(context).size;
+
+            return SizedBox(
+              width: espacio.width - 15,
+              child: Scaffold(
+                appBar: AppBar(
+                  title: Text(widget.titulo),
+                  centerTitle: true,
+                ),
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      const Text('Modal Registro de datos'),
+                      ElevatedButton(
+                        child: const Text('Cerrar'),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
       }, // Cambia estado al tocar
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(horizontal: 5),
         decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: LinearGradient(
-                  colors: [Colors.blue.shade400, Colors.blue.shade600],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-          boxShadow:[
-                  BoxShadow(
-                    // ignore: deprecated_member_use
-                    color: Colors.green.shade200.withOpacity(0.4),
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  )]
-              
-        ),
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              colors: [
+                Colors.blue.shade800,
+                Colors.blue.shade600,
+                Colors.blue.shade400
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                // ignore: deprecated_member_use
+                color: Colors.green.shade200.withOpacity(0.4),
+                blurRadius: 10,
+                offset: Offset(0, 4),
+              )
+            ]),
         child: CircleAvatar(
           maxRadius: 40,
           backgroundColor:
@@ -355,12 +383,12 @@ class _OpcionDosState extends State<_OpcionDos> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.monetization_on_outlined,
+                widget.icono,
                 size: 48,
                 color: Colors.white, // Ícono blanco
               ),
               Text(
-                "Dólares",
+                widget.titulo,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 10,
@@ -450,6 +478,61 @@ class _IconosProducto extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _CurrentDateTimeWidget extends StatefulWidget {
+  @override
+  State<_CurrentDateTimeWidget> createState() => _CurrentDateTimeWidgetState();
+}
+
+class _CurrentDateTimeWidgetState extends State<_CurrentDateTimeWidget> {
+  late Stream<String> _dateTimeStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _dateTimeStream = _generateDateTimeStream();
+  }
+
+  Stream<String> _generateDateTimeStream() async* {
+    while (true) {
+      await Future.delayed(const Duration(seconds: 1));
+      yield getCurrentDateTime();
+    }
+  }
+
+  String getCurrentDateTime() {
+    final now = DateTime.now();
+    return "${now.day}/${now.month.toString().padLeft(2, "0")}/${now.year} ${now.hour}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, "0")}";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<String>(
+      stream: _dateTimeStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Column(
+            children: [
+              Text(
+                "Fecha y hora actual:",
+                style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.green.shade700,
+                    fontWeight: FontWeight.bold),
+              ),
+              Text(
+                snapshot.data!,
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              ),
+            ],
+          );
+        } else {
+          return Text("Loading...", style: TextStyle(fontSize: 18));
+        }
+      },
     );
   }
 }
