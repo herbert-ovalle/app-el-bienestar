@@ -34,13 +34,18 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    //ReproductorMusic().ajusteVolumen(50);
+
     _checkInitialState();
+    ReproductorMusic().obtenerVolumen().then(
+      (volumen) => {
+        _volume = volumen
+    });
+
   }
 
   @override
   void didUpdateWidget(MusicPlayerScreen oldWidget) async {
-    await ReproductorMusic().ajusteVolumen(50);
+    //_volume = await ReproductorMusic().obtenerVolumen();
     super.didUpdateWidget(oldWidget);
   }
 

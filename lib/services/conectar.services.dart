@@ -1,9 +1,6 @@
-
 import 'package:flutter/services.dart';
 
-
-class ReproductorMusic{
- 
+class ReproductorMusic {
   final platform = MethodChannel('com.example.musicplayer/channel');
 
   Future<bool> validarReproductor() async {
@@ -23,7 +20,10 @@ class ReproductorMusic{
   }
 
   Future<void> ajusteVolumen(int volumen) async {
-    await platform.invokeMethod('ajusteVolumen',{'ajuste': volumen});
+    await platform.invokeMethod('ajusteVolumen', {'ajuste': volumen});
   }
 
+  Future<double> obtenerVolumen() async {
+    return await platform.invokeMethod('obtenerVolumen');
+  }
 }
