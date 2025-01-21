@@ -1,3 +1,4 @@
+import 'package:app_bienestar/component/formulario.component.dart';
 import 'package:app_bienestar/component/pageview.component.dart';
 import 'package:app_bienestar/component/productos.component.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +13,8 @@ class HomeBienestar extends StatelessWidget {
       mainAxisSize: MainAxisSize.max,
       children: [
         Container(
-            height: 28,
+            height: 34,
             width: double.infinity,
-            //color: const Color.fromARGB(255, 4, 0, 65),
             color: const Color.fromARGB(255, 67, 148, 70),
             child: Image(image: AssetImage("assets/LOGO_BLANCO.png"))),
         SizedBox(
@@ -33,9 +33,42 @@ class HomeBienestar extends StatelessWidget {
                 "assets/Remesas.png",
               ],
             )),
-        SizedBox(
-          height: 10,
+
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5),
+          child: TextButton(
+                    onPressed: (){
+                      Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => FormularioComponent()));
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.resolveWith((states) {
+                        if (states.contains(WidgetState.pressed)) {
+                          // Cambia la opacidad cuando el botón está presionado
+                          // ignore: deprecated_member_use
+                          return Colors.green.shade900.withOpacity(0.7);
+                        }
+                        return Colors.green.shade900;
+                      }),
+                      foregroundColor: WidgetStatePropertyAll(Colors.white),
+                      overlayColor: WidgetStatePropertyAll(
+                        Colors.green.shade700
+                            // ignore: deprecated_member_use
+                            .withOpacity(0.2), // Color de overlay al hacer clic
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.person, color: Colors.white),
+                        SizedBox(width: 10),
+                        Text("Registrese en la Aplicación"),
+                      ],
+                    )),
         ),
+      
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -46,10 +79,9 @@ class HomeBienestar extends StatelessWidget {
                     color: Colors.blue.shade700, size: 24), // Icono decorativo
                 const SizedBox(width: 8),
                 Text(
-                  "Mis Productos",
+                  "Solicite Ahorros y Creditos",
                   style: TextStyle(
                     fontSize: 24, // Tamaño más grande
-                    fontWeight: FontWeight.bold, // Negrita para destacar
                     foreground: Paint()
                       ..shader = LinearGradient(
                         colors: <Color>[
@@ -148,12 +180,11 @@ class HomeBienestar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _OpcionDos(icono: Icons.person, titulo: "Registro"),
-                    _OpcionDos(icono: Icons.house, titulo: "Hogar"),
-                    _OpcionDos(icono: Icons.monetization_on, titulo: "Finanzas"),
-                    _OpcionDos(icono: Icons.money_rounded, titulo: "Presupuesto"),
-                    _OpcionDos(
-                        icono: Icons.monitor_heart_outlined, titulo: "Noticias")
+                      _OpcionDos(icono: Icons.location_on, titulo: "Agencias"),
+                      _OpcionDos(icono: Icons.house, titulo: "Hogar"),
+                      _OpcionDos(icono: Icons.monetization_on, titulo: "Finanzas"),
+                      _OpcionDos(icono: Icons.money_rounded, titulo: "Presupuesto"),
+                      _OpcionDos(icono: Icons.monitor_heart_outlined, titulo: "Noticias")
                   ],
                 ),
               )
@@ -222,15 +253,15 @@ class _MisProductosBieState extends State<_MisProductosBie> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _IconosProducto(titulo: "Ahorros", icono: Icons.savings),
+              _IconosProducto(titulo: "Ahorros", icono: Icons.savings,index: 0,),
               _IconosProducto(
-                  titulo: "Préstamos", icono: Icons.real_estate_agent_outlined),
+                  titulo: "Préstamos", icono: Icons.real_estate_agent_outlined,index: 1,),
               _IconosProducto(
-                  titulo: "Seguros", icono: Icons.account_balance_outlined),
+                  titulo: "Seguros", icono: Icons.account_balance_outlined,index: 2,),
               _IconosProducto(
-                  titulo: "Remesas", icono: Icons.monetization_on_outlined),
+                  titulo: "Remesas", icono: Icons.monetization_on_outlined,index: 3,),
               _IconosProducto(
-                  titulo: "Propiedades en Venta", icono: Icons.house_outlined),
+                  titulo: "Propiedades en Venta", icono: Icons.house_outlined,index: 4,),
             ],
           ),
         ),
@@ -320,7 +351,6 @@ class _OpcionDosState extends State<_OpcionDos> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapDown: (_) {
-        debugPrint("onTapDown");
         showModalBottomSheet<void>(
           context: context,
           builder: (BuildContext context) {
@@ -357,7 +387,7 @@ class _OpcionDosState extends State<_OpcionDos> {
         padding: const EdgeInsets.symmetric(horizontal: 5),
         decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: LinearGradient(
+            /*gradient: LinearGradient(
               colors: [
                 Colors.blue.shade800,
                 Colors.blue.shade600,
@@ -373,7 +403,8 @@ class _OpcionDosState extends State<_OpcionDos> {
                 blurRadius: 10,
                 offset: Offset(0, 4),
               )
-            ]),
+            ]*/
+            color: Colors.white),
         child: CircleAvatar(
           maxRadius: 40,
           backgroundColor:
@@ -385,7 +416,7 @@ class _OpcionDosState extends State<_OpcionDos> {
               Icon(
                 widget.icono,
                 size: 48,
-                color: Colors.white, // Ícono blanco
+                color: Colors.blue.shade700, // Ícono blanco
               ),
               Text(
                 widget.titulo,
@@ -393,7 +424,7 @@ class _OpcionDosState extends State<_OpcionDos> {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white, // Texto blanco
+                  color: Colors.blue.shade700, // Texto blanco
                 ),
               ),
             ],
@@ -407,10 +438,12 @@ class _OpcionDosState extends State<_OpcionDos> {
 class _IconosProducto extends StatelessWidget {
   final String titulo;
   final IconData icono;
+  final int index;
 
   const _IconosProducto({
     required this.titulo,
-    required this.icono,
+    required this.icono, 
+    required this.index,
   });
 
   @override
@@ -422,7 +455,10 @@ class _IconosProducto extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ProductosScreen(tituloAppBar: titulo)),
+                builder: (context) => ProductosScreen(
+                      tituloAppBar: titulo,
+                      tipo: index,
+                    )),
           );
         },
         child: AnimatedContainer(
@@ -431,25 +467,7 @@ class _IconosProducto extends StatelessWidget {
           height: 140,
           width: 160,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.0),
-            gradient: LinearGradient(
-              colors: [
-                Colors.blue.shade400,
-                Colors.blue.shade600,
-                Colors.blue.shade800,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                // ignore: deprecated_member_use
-                color: Colors.blue.shade300.withOpacity(0.6),
-                blurRadius: 15,
-                offset: const Offset(0, 8), // Efecto de sombra
-              ),
-            ],
-          ),
+              borderRadius: BorderRadius.circular(12.0), color: Colors.white),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -460,7 +478,7 @@ class _IconosProducto extends StatelessWidget {
                 maxRadius: 40,
                 child: Icon(
                   icono,
-                  size: 70,
+                  size: 72,
                   color: Colors.blue.shade700,
                 ),
               ),
@@ -471,7 +489,7 @@ class _IconosProducto extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.blue.shade700,
                 ),
               )
             ],
