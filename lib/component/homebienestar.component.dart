@@ -18,7 +18,7 @@ class HomeBienestar extends StatelessWidget {
             color: const Color.fromARGB(255, 67, 148, 70),
             child: Image(image: AssetImage("assets/LOGO_BLANCO.png"))),
         SizedBox(
-            height: 240,
+            height: 210,
             child: PageViewExample(
               lstTitulos: [
                 "Ahorros el Bienestar",
@@ -97,100 +97,108 @@ class HomeBienestar extends StatelessWidget {
           ],
         ),
         _MisProductosBie(),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            decoration: BoxDecoration(
-              color: Colors.green.shade100, // Fondo suave para destacar
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  // ignore: deprecated_member_use
-                  color: Colors.green.shade300.withOpacity(0.5),
-                  blurRadius: 8,
-                  offset: Offset(0, 4), // Sombra para destacar
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.monetization_on_outlined,
-                      color: Colors.green.shade700, // Ícono representativo
-                      size: 30,
-                    ),
-                    const SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Tasa de Cambio:",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors
-                                .green.shade700, // Texto principal llamativo
-                          ),
-                        ),
-                        Text(
-                          "7.60",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green.shade900, // Valor destacado
-                          ),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade100, // Fondo suave para destacar
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          // ignore: deprecated_member_use
+                          color: Colors.green.shade300.withOpacity(0.5),
+                          blurRadius: 8,
+                          offset: Offset(0, 4), // Sombra para destacar
                         ),
                       ],
                     ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.monetization_on_outlined,
+                              color: Colors.green.shade700, // Ícono representativo
+                              size: 30,
+                            ),
+                            const SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Tasa de Cambio:",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors
+                                        .green.shade700, // Texto principal llamativo
+                                  ),
+                                ),
+                                Text(
+                                  "7.60",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green.shade900, // Valor destacado
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        _CurrentDateTimeWidget()
+                      ],
+                    ),
+                  ),
+                ),
+                 SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Text("Aplicaciones"),
+                    ),
                   ],
                 ),
-                _CurrentDateTimeWidget()
+                SizedBox(
+                  height: 5,
+                ),
+
+                 SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _OpcionDos(icono: Icons.location_on, titulo: "Agencias"),
+                      _OpcionDos(icono: Icons.house, titulo: "Hogar"),
+                      _OpcionDos(
+                          icono: Icons.monetization_on, titulo: "Finanzas"),
+                      _OpcionDos(
+                          icono: Icons.money_rounded, titulo: "Presupuesto"),
+                      _OpcionDos(
+                          icono: Icons.monitor_heart_outlined,
+                          titulo: "Noticias")
+                    ],
+                  ),
+                )
               ],
             ),
           ),
         ),
-        SizedBox(
-          height: 10,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: Text("Aplicaciones"),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 5,
-        ),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(children: [
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                      _OpcionDos(icono: Icons.location_on, titulo: "Agencias"),
-                      _OpcionDos(icono: Icons.house, titulo: "Hogar"),
-                      _OpcionDos(icono: Icons.monetization_on, titulo: "Finanzas"),
-                      _OpcionDos(icono: Icons.money_rounded, titulo: "Presupuesto"),
-                      _OpcionDos(icono: Icons.monitor_heart_outlined, titulo: "Noticias")
-                  ],
-                ),
-              )
-            ]),
-          ),
-        )
+       
       ],
     );
   }
@@ -239,8 +247,9 @@ class _MisProductosBieState extends State<_MisProductosBie> {
 
   @override
   void dispose() {
-    _scrollController.removeListener(_scrollListener); // Eliminar el listener
+    _scrollController.removeListener(_scrollListener);
     _scrollController.dispose(); // Limpiar el controlador
+
     super.dispose();
   }
 
@@ -294,7 +303,7 @@ class _MisProductosBieState extends State<_MisProductosBie> {
               child: Icon(
                 Icons.arrow_forward,
                 color: Colors.white,
-                size: 48,
+                size: 46,
               ),
             ),
           ),
@@ -464,8 +473,8 @@ class _IconosProducto extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
-          height: 140,
-          width: 160,
+          height: 125,
+          width: 140,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.0), color: Colors.white),
           child: Column(
@@ -486,8 +495,10 @@ class _IconosProducto extends StatelessWidget {
               Text(
                 titulo,
                 textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.blue.shade700,
                 ),

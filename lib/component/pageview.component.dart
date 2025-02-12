@@ -40,6 +40,7 @@ class _PageViewExampleState extends State<PageViewExample>
     super.dispose();
     _pageViewController.dispose();
     _tabController.dispose();
+    FocusManager.instance.primaryFocus?.unfocus();
     _timer.cancel();
   }
 
