@@ -5,9 +5,22 @@ class AppTheme {
     Widget? suffixIcon,
     required String label,
     required String hint,
+    required bool requerido
   }) {
     return InputDecoration(
-      labelText: label,
+      label: RichText(
+      text: TextSpan(
+        text: label,
+        style: TextStyle(color: Colors.black, fontSize: 18),
+        children: [
+          if (requerido)
+            TextSpan(
+              text: ' *',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+      ),
       hintText: hint,
       suffixIcon: suffixIcon,
       labelStyle:

@@ -1,8 +1,10 @@
-import 'package:app_bienestar/component/formulario.component.dart';
-import 'package:app_bienestar/component/pageview.component.dart';
-import 'package:app_bienestar/component/productos.component.dart';
+import 'package:app_bienestar/component/z_component.dart';
+import 'package:app_bienestar/screen/login.screen.dart';
+import 'package:app_bienestar/services/qExterno.service.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeBienestar extends StatelessWidget {
   const HomeBienestar({super.key});
@@ -33,42 +35,7 @@ class HomeBienestar extends StatelessWidget {
                 "assets/Remesas.png",
               ],
             )),
-
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5),
-          child: TextButton(
-                    onPressed: (){
-                      Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => FormularioComponent()));
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.resolveWith((states) {
-                        if (states.contains(WidgetState.pressed)) {
-                          // Cambia la opacidad cuando el botón está presionado
-                          // ignore: deprecated_member_use
-                          return Colors.green.shade900.withOpacity(0.7);
-                        }
-                        return Colors.green.shade900;
-                      }),
-                      foregroundColor: WidgetStatePropertyAll(Colors.white),
-                      overlayColor: WidgetStatePropertyAll(
-                        Colors.green.shade700
-                            // ignore: deprecated_member_use
-                            .withOpacity(0.2), // Color de overlay al hacer clic
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.person, color: Colors.white),
-                        SizedBox(width: 10),
-                        Text("Registrese en la Aplicación"),
-                      ],
-                    )),
-        ),
-      
+        RegistroButton(),
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -104,8 +71,8 @@ class HomeBienestar extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
                     decoration: BoxDecoration(
                       color: Colors.green.shade100, // Fondo suave para destacar
                       borderRadius: BorderRadius.circular(12),
@@ -126,7 +93,8 @@ class HomeBienestar extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.monetization_on_outlined,
-                              color: Colors.green.shade700, // Ícono representativo
+                              color:
+                                  Colors.green.shade700, // Ícono representativo
                               size: 30,
                             ),
                             const SizedBox(width: 8),
@@ -138,8 +106,8 @@ class HomeBienestar extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors
-                                        .green.shade700, // Texto principal llamativo
+                                    color: Colors.green
+                                        .shade700, // Texto principal llamativo
                                   ),
                                 ),
                                 Text(
@@ -147,7 +115,8 @@ class HomeBienestar extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.green.shade900, // Valor destacado
+                                    color: Colors
+                                        .green.shade900, // Valor destacado
                                   ),
                                 ),
                               ],
@@ -159,7 +128,7 @@ class HomeBienestar extends StatelessWidget {
                     ),
                   ),
                 ),
-                 SizedBox(
+                SizedBox(
                   height: 10,
                 ),
                 Row(
@@ -175,22 +144,27 @@ class HomeBienestar extends StatelessWidget {
                 SizedBox(
                   height: 5,
                 ),
-
-                 SingleChildScrollView(
+                SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _OpcionDos(icono: Icons.location_on, titulo: "Agencias"),
-                      _OpcionDos(icono: Icons.house, titulo: "Hogar"),
                       _OpcionDos(
-                          icono: Icons.monetization_on, titulo: "Finanzas"),
+                          assetsvg: "assets/locationAge.svg",
+                          titulo: "Agencias",
+                          onTap: (value) async {
+                            await PeticionesExternas().postTasaCambio();
+                          }),
                       _OpcionDos(
-                          icono: Icons.money_rounded, titulo: "Presupuesto"),
-                      _OpcionDos(
-                          icono: Icons.monitor_heart_outlined,
-                          titulo: "Noticias")
+                          assetsvg: "assets/loginsvg.svg",
+                          titulo: "Ingresar app",
+                          onTap: (value) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BankLoginScreen()));
+                          })
                     ],
                   ),
                 )
@@ -198,7 +172,6 @@ class HomeBienestar extends StatelessWidget {
             ),
           ),
         ),
-       
       ],
     );
   }
@@ -262,15 +235,31 @@ class _MisProductosBieState extends State<_MisProductosBie> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
-              _IconosProducto(titulo: "Ahorros", icono: Icons.savings,index: 0,),
               _IconosProducto(
-                  titulo: "Préstamos", icono: Icons.real_estate_agent_outlined,index: 1,),
+                titulo: "Ahorros",
+                icono: Icons.savings,
+                index: 0,
+              ),
               _IconosProducto(
-                  titulo: "Seguros", icono: Icons.account_balance_outlined,index: 2,),
+                titulo: "Préstamos",
+                icono: Icons.real_estate_agent_outlined,
+                index: 1,
+              ),
               _IconosProducto(
-                  titulo: "Remesas", icono: Icons.monetization_on_outlined,index: 3,),
+                titulo: "Seguros",
+                icono: Icons.account_balance_outlined,
+                index: 2,
+              ),
               _IconosProducto(
-                  titulo: "Propiedades en Venta", icono: Icons.house_outlined,index: 4,),
+                titulo: "Remesas",
+                icono: Icons.monetization_on_outlined,
+                index: 3,
+              ),
+              _IconosProducto(
+                titulo: "Propiedades en Venta",
+                icono: Icons.house_outlined,
+                index: 4,
+              ),
             ],
           ),
         ),
@@ -345,75 +334,24 @@ class _MisProductosBieState extends State<_MisProductosBie> {
   }
 }
 
-class _OpcionDos extends StatefulWidget {
-  final IconData icono;
+class _OpcionDos extends StatelessWidget {
+  final IconData? icono;
   final String titulo;
+  final String? assetsvg;
+  final Function(TapDownDetails valor) onTap;
 
-  const _OpcionDos({required this.icono, required this.titulo});
+  const _OpcionDos(
+      {this.icono, required this.titulo, this.assetsvg, required this.onTap});
 
-  @override
-  State<_OpcionDos> createState() => _OpcionDosState();
-}
-
-class _OpcionDosState extends State<_OpcionDos> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) {
-        showModalBottomSheet<void>(
-          context: context,
-          builder: (BuildContext context) {
-            final espacio = MediaQuery.of(context).size;
-
-            return SizedBox(
-              width: espacio.width - 15,
-              child: Scaffold(
-                appBar: AppBar(
-                  title: Text(widget.titulo),
-                  centerTitle: true,
-                ),
-                body: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const Text('Modal Registro de datos'),
-                      ElevatedButton(
-                        child: const Text('Cerrar'),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      }, // Cambia estado al tocar
+      onTapDown: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(horizontal: 5),
-        decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            /*gradient: LinearGradient(
-              colors: [
-                Colors.blue.shade800,
-                Colors.blue.shade600,
-                Colors.blue.shade400
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                // ignore: deprecated_member_use
-                color: Colors.green.shade200.withOpacity(0.4),
-                blurRadius: 10,
-                offset: Offset(0, 4),
-              )
-            ]*/
-            color: Colors.white),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
         child: CircleAvatar(
           maxRadius: 40,
           backgroundColor:
@@ -422,13 +360,16 @@ class _OpcionDosState extends State<_OpcionDos> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                widget.icono,
-                size: 48,
-                color: Colors.blue.shade700, // Ícono blanco
-              ),
+              if (assetsvg != null)
+                SvgPicture.asset(assetsvg ?? "", height: 48, width: 48),
+              if (icono != null)
+                Icon(
+                  icono,
+                  size: 48,
+                  color: Colors.blue.shade700, // Ícono blanco
+                ),
               Text(
-                widget.titulo,
+                titulo,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 10,
@@ -448,10 +389,9 @@ class _IconosProducto extends StatelessWidget {
   final String titulo;
   final IconData icono;
   final int index;
-
   const _IconosProducto({
     required this.titulo,
-    required this.icono, 
+    required this.icono,
     required this.index,
   });
 

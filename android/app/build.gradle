@@ -9,19 +9,19 @@ android {
     namespace = "com.example.app_bienestar"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+    compileSdkVersion 34
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = "17"
     }
 
     dependencies {
         implementation 'com.google.android.exoplayer:exoplayer:2.19.0'
-        classpath 'com.android.tools.build:gradle:8.1.0'
     }
 
     defaultConfig {

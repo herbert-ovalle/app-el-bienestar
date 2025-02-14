@@ -2,21 +2,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class ConfigScreen extends StatefulWidget {
+class ConfigScreen extends StatelessWidget {
 
   const ConfigScreen({super.key});
 
   @override
-  State<ConfigScreen> createState() => _ConfigScreenState();
-}
-
-class _ConfigScreenState extends State<ConfigScreen> {
-
-  bool _isDark = false;
-
-  @override
   Widget build(BuildContext context) {
-
+     bool _isDark = false;
     return Scaffold(
       body: Center(
         child: Container(
@@ -27,42 +19,40 @@ class _ConfigScreenState extends State<ConfigScreen> {
                   title: "General",
                   children: [
                     _CustomListTile(
-                        title: "Dark Mode",
+                        title: "Modo oscuro",
                         icon: Icons.dark_mode_outlined,
                         trailing: Switch(
                             value: _isDark,
                             onChanged: (value) {
-                              setState(() {
                                 _isDark = value;
-                              });
                             })),
                     const _CustomListTile(
-                        title: "Notifications",
+                        title: "Notificaciones",
                         icon: Icons.notifications_none_rounded),
                     const _CustomListTile(
-                        title: "Security Status",
+                        title: "Seguridad",
                         icon: CupertinoIcons.lock_shield)]),
                                       const Divider(),
               const _SingleSection(
-                title: "Organization",
+                title: "Organización",
                 children: [
                   _CustomListTile(
-                      title: "Profile", icon: Icons.person_outline_rounded),
-                  _CustomListTile(title: "Messaging", icon: Icons.message_outlined),
-                  _CustomListTile(title: "Calling", icon: Icons.phone_outlined),
-                  _CustomListTile(title: "People", icon: Icons.contacts_outlined),
+                      title: "Perfil", icon: Icons.person_outline_rounded),
+                  _CustomListTile(title: "Mensajes", icon: Icons.message_outlined),
+                  _CustomListTile(title: "LLamadas", icon: Icons.phone_outlined),
+                  _CustomListTile(title: "Contactos", icon: Icons.contacts_outlined),
                   _CustomListTile(
-                      title: "Calendar", icon: Icons.calendar_today_rounded)
+                      title: "Calendario", icon: Icons.calendar_today_rounded)
                 ],
               ),
               const Divider(),
               const _SingleSection(
                 children: [
                   _CustomListTile(
-                      title: "Help & Feedback", icon: Icons.help_outline_rounded),
-                  _CustomListTile(title: "About", icon: Icons.info_outline_rounded),
+                      title: "Ayuda y retroalimentación", icon: Icons.help_outline_rounded),
+                  _CustomListTile(title: "Información", icon: Icons.info_outline_rounded),
                   _CustomListTile(
-                      title: "Sign out", icon: Icons.exit_to_app_rounded),
+                      title: "Salir", icon: Icons.exit_to_app_rounded),
                 ],
               ),
             ]

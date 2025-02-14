@@ -1,6 +1,8 @@
-import 'package:app_bienestar/component/homebienestar.component.dart';
+import 'package:app_bienestar/component/formulario.component.dart';
 import 'package:app_bienestar/component/radio.component.dart';
 import 'package:app_bienestar/screen/config.screen.dart';
+import 'package:app_bienestar/screen/homebien.screen.dart';
+import 'package:app_bienestar/screen/login.screen.dart';
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
@@ -95,17 +97,36 @@ class _ProfileIcon extends StatelessWidget {
         offset: const Offset(0, 40),
         onSelected: (Menu item) {},
         itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
-              const PopupMenuItem<Menu>(
+              PopupMenuItem<Menu>(
                 value: Menu.itemOne,
-                child: MenuLista(icono: Icons.person,texto: "Cuenta"),
+                child: MenuLista(icono: Icons.login, texto: "Login"),
+                onTap: () {
+                   Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => BankLoginScreen()));
+                },
               ),
-              const PopupMenuItem<Menu>(
+              PopupMenuItem<Menu>(
                 value: Menu.itemTwo,
                 child: MenuLista(icono: Icons.person_add, texto: 'Registro de Datos'),
+                onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FormularioComponent()));
+                },
               ),
-              const PopupMenuItem<Menu>(
+              PopupMenuItem<Menu>(
                 value: Menu.itemThree,
                 child: MenuLista(icono: Icons.settings, texto: 'Configuración'),
+                onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ConfigScreen()));
+                },
+
               ),
               const PopupMenuItem<Menu>(
                 value: Menu.itemFour,

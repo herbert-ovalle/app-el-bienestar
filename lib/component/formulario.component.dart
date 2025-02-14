@@ -1,4 +1,5 @@
-import 'package:app_bienestar/models/validador.model.dart';
+
+import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/providers/registro_user.dart';
 import 'package:app_bienestar/themes/tema_app.dart';
 import 'package:flutter/material.dart';
@@ -22,19 +23,20 @@ class _FormularioComponentState extends State<FormularioComponent> {
   final TextEditingController _correoController = TextEditingController();
   final TextEditingController _telefonoController = TextEditingController();
   final TextEditingController _direccionController = TextEditingController();
-  final TextEditingController _usuarioController = TextEditingController();
   final TextEditingController _contrasenaController = TextEditingController();
 
+  final FocusNode _dpiFocus = FocusNode();
+  final FocusNode _telefonoFocus = FocusNode();
   final FocusNode _nombreFocus = FocusNode();
-  final FocusNode _correoFocus = FocusNode();
 
   @override
   void dispose() {
     _nombreController.dispose();
     _correoController.dispose();
     _telefonoController.dispose();
+    _dpiFocus.dispose();
+    _telefonoFocus.dispose();
     _nombreFocus.dispose();
-    _correoFocus.dispose();
     FocusManager.instance.primaryFocus?.unfocus();
     super.dispose();
   }
@@ -47,9 +49,8 @@ class _FormularioComponentState extends State<FormularioComponent> {
 
   @override
   Widget build(BuildContext context) {
-      
     return Scaffold(
-      appBar: AppBar(title: Text("Registro de Datos")),
+      appBar: AppBar(title: Text("Registre sus datos")),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Form(
@@ -61,6 +62,39 @@ class _FormularioComponentState extends State<FormularioComponent> {
               runSpacing: 5.0,
               children: [
                 // Nombre
+                InputForm(
+                    name: "dpi",
+                    controller: _dpiController,
+                    label: "DPI",
+                    hint: "Ingrese su CUI",
+                    keyboardType: TextInputType.number,
+                    campoObli: true,
+                    autoFocus: true,
+                    focusNode: _dpiFocus,
+                    nextFocus: _telefonoFocus,
+                    formatters: [
+                      MaskTextInputFormatter(
+                          mask: '#### ##### ####',
+                          type: MaskAutoCompletionType.lazy)
+                    ],
+                    validar: Validar(maxLength: 15, minLength: 15)),
+
+                InputForm(
+                    name: "telefono",
+                    controller: _telefonoController,
+                    label: "Teléfono",
+                    hint: "Ingrese su teléfono",
+                    keyboardType: TextInputType.phone,
+                    focusNode: _telefonoFocus,
+                    nextFocus: _nombreFocus,
+                    campoObli: true,
+                    formatters: [
+                      MaskTextInputFormatter(
+                          mask: '#### ####',
+                          filter: {"#": RegExp(r'[0-9]')},
+                          type: MaskAutoCompletionType.lazy)
+                    ],
+                    validar: Validar(maxLength: 9, minLength: 9)),
 
                 InputForm(
                     name: "nombre",
@@ -68,8 +102,6 @@ class _FormularioComponentState extends State<FormularioComponent> {
                     label: "Nombre",
                     hint: "Ingrese su nombre completo",
                     focusNode: _nombreFocus,
-                    nextFocus: _correoFocus,
-                    autoFocus: true,
                     campoObli: true,
                     validar: Validar(maxLength: 60, minLength: 12)),
 
@@ -78,7 +110,6 @@ class _FormularioComponentState extends State<FormularioComponent> {
                   controller: _correoController,
                   label: "Correo",
                   hint: "Ingrese un correo válido",
-                  focusNode: _correoFocus,
                   autoFocus: true,
                   validator: (value) {
                     /*if (value == null || value.isEmpty) {
@@ -94,34 +125,6 @@ class _FormularioComponentState extends State<FormularioComponent> {
                   validar: Validar(maxLength: 100),
                 ),
 
-                InputForm(
-                    name: "dpi",
-                    controller: _dpiController,
-                    label: "DPI",
-                    hint: "Ingrese su CUI",
-                    keyboardType: TextInputType.number,
-                    campoObli: true,
-                    formatters: [
-                      MaskTextInputFormatter(
-                          mask: '#### ##### ####',
-                          type: MaskAutoCompletionType.lazy)
-                    ],
-                    validar: Validar(maxLength: 15, minLength: 15)),
-
-                InputForm(
-                    name: "telefono",
-                    controller: _telefonoController,
-                    label: "Teléfono",
-                    hint: "Ingrese su teléfono",
-                    keyboardType: TextInputType.phone,
-                    campoObli: true,
-                    formatters: [
-                      MaskTextInputFormatter(
-                          mask: '#### ####',
-                          filter: {"#": RegExp(r'[0-9]')},
-                          type: MaskAutoCompletionType.lazy)
-                    ],
-                    validar: Validar(maxLength: 9, minLength: 9)),
                 // Dirección
                 InputForm(
                     name: "direccion",
@@ -129,14 +132,14 @@ class _FormularioComponentState extends State<FormularioComponent> {
                     label: "Dirección",
                     hint: "Ingrese su dirección"),
                 // Usuario
-                InputForm(
+                /*InputForm(
                   name: "usuario",
                   controller: _usuarioController,
                   label: "Usuario",
                   hint: "Ingrese un usuario",
                   campoObli: true,
                   validar: Validar(maxLength: 10, minLength: 5),
-                ),
+                ),*/
                 // Contraseña
                 _buildPasswordField(),
                 // Botón de envío
@@ -151,13 +154,18 @@ class _FormularioComponentState extends State<FormularioComponent> {
 
   /// Campo de contraseña con botón de "ver contraseña"
   Widget _buildPasswordField() {
+    final dato = Provider.of<DatosUsuarioProvider>(context);
     return SizedBox(
       width: MediaQuery.of(context).size.width > 600 ? 300 : double.infinity,
       child: TextFormField(
         controller: _contrasenaController,
         obscureText: !_showPassword,
-        style:  AppTheme.textStyleInput(),
-        decoration: AppTheme.inputDecoration(label: "Contraseña", hint: "Ingrese su contraseña", suffixIcon: IconButton(
+        style: AppTheme.textStyleInput(),
+        decoration: AppTheme.inputDecoration(
+          label: "Contraseña",
+          hint: "Ingrese su contraseña",
+          requerido: true,
+          suffixIcon: IconButton(
             icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
             onPressed: () {
               setState(() {
@@ -173,6 +181,9 @@ class _FormularioComponentState extends State<FormularioComponent> {
           if (value.length < 10) return "Debe tener al menos 10 caracteres";
           return null;
         },
+        onChanged: (value) {
+          dato.datosUsuario['contrasena'] = value;
+        },
       ),
     );
   }
@@ -187,7 +198,8 @@ class _FormularioComponentState extends State<FormularioComponent> {
         onPressed: () {
           if (_formKey.currentState!.validate()) {
             FocusScope.of(context).unfocus();
-            debugPrint(datoUser.datosUsuario.toString());
+            final datUser = RegistroUsuario.fromJson(datoUser.datosUsuario);
+            debugPrint(datUser.toRawJson());
             // Aquí podrías enviar los datos a un backend o hacer otra acción
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Registro exitoso")),
@@ -226,7 +238,7 @@ class InputForm extends StatefulWidget {
     this.autoFocus = false,
     this.formatters,
     this.campoObli = false,
-    this.validar, 
+    this.validar,
   });
 
   final String name;
@@ -250,11 +262,11 @@ class _InputFormState extends State<InputForm> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    /*WidgetsBinding.instance.addPostFrameCallback((_) {
       final datoUser =
           Provider.of<DatosUsuarioProvider>(context, listen: false);
       datoUser.setDato(widget.name, "");
-    });
+    });*/
   }
 
   @override
@@ -287,7 +299,10 @@ class _InputFormState extends State<InputForm> {
         textInputAction: widget.nextFocus != null
             ? TextInputAction.next
             : TextInputAction.done,
-        decoration: AppTheme.inputDecoration(label: widget.label, hint: widget.hint),
+        decoration: AppTheme.inputDecoration(
+            label: widget.label,
+            hint: widget.hint,
+            requerido: widget.campoObli),
         validator: effectiveValidator,
         onFieldSubmitted: (_) {
           if (widget.nextFocus != null) {
