@@ -3,17 +3,27 @@ import 'dart:convert';
 class Validar {
   final String? type;
   final int maxLength;
-  final int minLength;
+  final int? minLength;
   final int max;
   final int min;
 
   Validar({
     this.type,
-    this.maxLength = 10,
-    this.minLength = 1,
+    required this.maxLength,
+    this.minLength,
     this.max = 5,
     this.min = 1,
   });
+
+  factory Validar.defaultValues() {
+    return Validar(
+      type: "text",
+      maxLength: 255,
+      minLength: 5,
+      max: 100,
+      min: 1,
+    );
+  }
 
   factory Validar.fromRawJson(String str) => Validar.fromJson(json.decode(str));
 

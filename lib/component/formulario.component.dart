@@ -1,8 +1,10 @@
 import 'package:app_bienestar/models/validador.model.dart';
 import 'package:app_bienestar/providers/registro_user.dart';
+import 'package:app_bienestar/themes/tema_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class FormularioComponent extends StatefulWidget {
   const FormularioComponent({super.key});
@@ -39,13 +41,13 @@ class _FormularioComponentState extends State<FormularioComponent> {
 
   @override
   void deactivate() {
-    //FocusManager.instance.primaryFocus?.unfocus();
     FocusScope.of(context).unfocus();
     super.deactivate();
   }
 
   @override
   Widget build(BuildContext context) {
+      
     return Scaffold(
       appBar: AppBar(title: Text("Registro de Datos")),
       body: Padding(
@@ -69,26 +71,28 @@ class _FormularioComponentState extends State<FormularioComponent> {
                     nextFocus: _correoFocus,
                     autoFocus: true,
                     campoObli: true,
-                    validar: Validar(maxLength: 20, max: 0)),
+                    validar: Validar(maxLength: 60, minLength: 12)),
 
                 InputForm(
-                    name: "correo",
-                    controller: _correoController,
-                    label: "Correo",
-                    hint: "Ingrese un correo válido",
-                    focusNode: _correoFocus,
-                    autoFocus: true,
-                    validator: (value) {
-                      /*if (value == null || value.isEmpty) {
+                  name: "correo",
+                  controller: _correoController,
+                  label: "Correo",
+                  hint: "Ingrese un correo válido",
+                  focusNode: _correoFocus,
+                  autoFocus: true,
+                  validator: (value) {
+                    /*if (value == null || value.isEmpty) {
                           return "Correo requerido";
                         }*/
-                      if (value != null &&
-                          value.isNotEmpty &&
-                          !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                        return "Correo inválido";
-                      }
-                      return null;
-                    }),
+                    if (value != null &&
+                        value.isNotEmpty &&
+                        !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                      return "Correo inválido";
+                    }
+                    return null;
+                  },
+                  validar: Validar(maxLength: 100),
+                ),
 
                 InputForm(
                     name: "dpi",
@@ -96,12 +100,13 @@ class _FormularioComponentState extends State<FormularioComponent> {
                     label: "DPI",
                     hint: "Ingrese su CUI",
                     keyboardType: TextInputType.number,
-                    maxLength: 13,
                     campoObli: true,
                     formatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(13),
-                    ]),
+                      MaskTextInputFormatter(
+                          mask: '#### ##### ####',
+                          type: MaskAutoCompletionType.lazy)
+                    ],
+                    validar: Validar(maxLength: 15, minLength: 15)),
 
                 InputForm(
                     name: "telefono",
@@ -109,12 +114,14 @@ class _FormularioComponentState extends State<FormularioComponent> {
                     label: "Teléfono",
                     hint: "Ingrese su teléfono",
                     keyboardType: TextInputType.phone,
-                    maxLength: 8,
                     campoObli: true,
                     formatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(10),
-                    ]),
+                      MaskTextInputFormatter(
+                          mask: '#### ####',
+                          filter: {"#": RegExp(r'[0-9]')},
+                          type: MaskAutoCompletionType.lazy)
+                    ],
+                    validar: Validar(maxLength: 9, minLength: 9)),
                 // Dirección
                 InputForm(
                     name: "direccion",
@@ -123,11 +130,13 @@ class _FormularioComponentState extends State<FormularioComponent> {
                     hint: "Ingrese su dirección"),
                 // Usuario
                 InputForm(
-                    name: "usuario",
-                    controller: _usuarioController,
-                    label: "Usuario",
-                    hint: "Ingrese un usuario",
-                    campoObli: true),
+                  name: "usuario",
+                  controller: _usuarioController,
+                  label: "Usuario",
+                  hint: "Ingrese un usuario",
+                  campoObli: true,
+                  validar: Validar(maxLength: 10, minLength: 5),
+                ),
                 // Contraseña
                 _buildPasswordField(),
                 // Botón de envío
@@ -147,11 +156,8 @@ class _FormularioComponentState extends State<FormularioComponent> {
       child: TextFormField(
         controller: _contrasenaController,
         obscureText: !_showPassword,
-        decoration: InputDecoration(
-          labelText: "Contraseña",
-          hintText: "Ingrese su contraseña",
-          border: OutlineInputBorder(),
-          suffixIcon: IconButton(
+        style:  AppTheme.textStyleInput(),
+        decoration: AppTheme.inputDecoration(label: "Contraseña", hint: "Ingrese su contraseña", suffixIcon: IconButton(
             icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
             onPressed: () {
               setState(() {
@@ -212,16 +218,15 @@ class InputForm extends StatefulWidget {
     required this.controller,
     required this.label,
     required this.hint,
-    required this.name, 
+    required this.name,
     this.keyboardType = TextInputType.text,
     this.validator,
     this.focusNode,
     this.nextFocus,
     this.autoFocus = false,
     this.formatters,
-    this.maxLength = 500,
     this.campoObli = false,
-    this.validar,
+    this.validar, 
   });
 
   final String name;
@@ -234,7 +239,6 @@ class InputForm extends StatefulWidget {
   final FocusNode? nextFocus;
   final bool autoFocus;
   final List<TextInputFormatter>? formatters;
-  final int maxLength;
   final bool campoObli;
   final Validar? validar;
 
@@ -256,12 +260,13 @@ class _InputFormState extends State<InputForm> {
   @override
   Widget build(BuildContext context) {
     final datoUser = Provider.of<DatosUsuarioProvider>(context);
+    Validar valida = widget.validar ?? Validar.defaultValues();
     effectiveValidator(value) {
       if (widget.campoObli) {
         if (widget.validator != null) {
           return widget.validator!(value);
         }
-        if (value.isEmpty || value.length < widget.validar?.maxLength) {
+        if (value.isEmpty || value.length < valida.minLength) {
           return "El campo ${widget.label} es obligatorio";
         }
       } else {
@@ -274,6 +279,7 @@ class _InputFormState extends State<InputForm> {
       child: TextFormField(
         autovalidateMode: AutovalidateMode.onUserInteraction,
         controller: widget.controller,
+        style: AppTheme.textStyleInput(),
         keyboardType: widget.keyboardType,
         focusNode: widget.focusNode,
         autofocus: widget.autoFocus,
@@ -281,20 +287,16 @@ class _InputFormState extends State<InputForm> {
         textInputAction: widget.nextFocus != null
             ? TextInputAction.next
             : TextInputAction.done,
-        decoration: InputDecoration(
-          labelText: widget.label,
-          hintText: widget.hint,
-          border: const OutlineInputBorder(),
-        ),
+        decoration: AppTheme.inputDecoration(label: widget.label, hint: widget.hint),
         validator: effectiveValidator,
         onFieldSubmitted: (_) {
-          if (widget.nextFocus != null)
+          if (widget.nextFocus != null) {
             FocusScope.of(context).requestFocus(widget.nextFocus);
+          }
         },
         onChanged: (value) {
           datoUser.datosUsuario[widget.name] = value;
         },
-        maxLength: widget.maxLength,
       ),
     );
   }
