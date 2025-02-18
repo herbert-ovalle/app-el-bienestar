@@ -1,3 +1,4 @@
+import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/component/formulario.component.dart';
 import 'package:app_bienestar/component/radio.component.dart';
 import 'package:app_bienestar/screen/config.screen.dart';
@@ -14,35 +15,66 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  final List<SalomonBottomBarItem> navBarItems = [
-    SalomonBottomBarItem(
-      icon: const Icon(Icons.home),
-      title: const Text("Inicio", style: TextStyle(fontSize: 20)),
-      selectedColor: const Color.fromARGB(255, 2, 1, 99),
-    ),
-    SalomonBottomBarItem(
-      icon: const Icon(Icons.radio),
-      title: const Text("Radio", style: TextStyle(fontSize: 20)),
-      selectedColor: Colors.green[500],
-    ),
-    SalomonBottomBarItem(
-      icon: const Icon(Icons.account_balance),
-      title: const Text("Productos", style: TextStyle(fontSize: 20)),
-      selectedColor: Colors.orange,
-    ),
-    SalomonBottomBarItem(
-      icon: const Icon(Icons.settings),
-      title: const Text("Ajustes", style: TextStyle(fontSize: 20)),
-      selectedColor: Colors.teal,
-    ),
-  ];
+
+  late List<SalomonBottomBarItem> navBarItems;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateNavBarItems(); // Llamar función para inicializar
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    setState(() {
+      _updateNavBarItems();
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeScreen oldWidget) {
+    setState(() {
+      _updateNavBarItems();
+    });
+    super.didUpdateWidget(oldWidget);
+  }
+
+  void _updateNavBarItems() {
+    navBarItems = [
+      SalomonBottomBarItem(
+        icon: const Icon(Icons.home),
+        title: const Text("Inicio", style: TextStyle(fontSize: 20)),
+        selectedColor: Preferences.isDarkmode
+            ? Colors.white
+            : const Color.fromARGB(255, 2, 1, 99),
+      ),
+      SalomonBottomBarItem(
+        icon: const Icon(Icons.radio),
+        title: const Text("Radio", style: TextStyle(fontSize: 20)),
+        selectedColor: Colors.green[500],
+      ),
+      SalomonBottomBarItem(
+        icon: const Icon(Icons.account_balance),
+        title: const Text("Productos", style: TextStyle(fontSize: 20)),
+        selectedColor: Colors.orange,
+      ),
+      SalomonBottomBarItem(
+        icon: const Icon(Icons.settings),
+        title: const Text("Ajustes", style: TextStyle(fontSize: 20)),
+        selectedColor: Colors.teal,
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: navBarItems[_selectedIndex].title,
-        backgroundColor: navBarItems[_selectedIndex].selectedColor,
+        backgroundColor: Preferences.isDarkmode
+            ? null
+            : navBarItems[_selectedIndex].selectedColor,
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 16.0),
@@ -57,8 +89,9 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedItemColor: const Color(0xff6200ee),
           unselectedItemColor: const Color(0xff757575),
           onTap: (index) {
+            _selectedIndex = index;
             setState(() {
-              _selectedIndex = index;
+              _updateNavBarItems();
             });
           },
           items: navBarItems),
@@ -85,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-enum Menu { itemOne, itemTwo, itemThree,itemFour }
+enum Menu { itemOne, itemTwo, itemThree, itemFour }
 
 class _ProfileIcon extends StatelessWidget {
   const _ProfileIcon();
@@ -101,7 +134,7 @@ class _ProfileIcon extends StatelessWidget {
                 value: Menu.itemOne,
                 child: MenuLista(icono: Icons.login, texto: "Login"),
                 onTap: () {
-                   Navigator.push(
+                  Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => BankLoginScreen()));
@@ -109,9 +142,10 @@ class _ProfileIcon extends StatelessWidget {
               ),
               PopupMenuItem<Menu>(
                 value: Menu.itemTwo,
-                child: MenuLista(icono: Icons.person_add, texto: 'Registro de Datos'),
+                child: MenuLista(
+                    icono: Icons.person_add, texto: 'Registro de Datos'),
                 onTap: () {
-                    Navigator.push(
+                  Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => FormularioComponent()));
@@ -121,12 +155,9 @@ class _ProfileIcon extends StatelessWidget {
                 value: Menu.itemThree,
                 child: MenuLista(icono: Icons.settings, texto: 'Configuración'),
                 onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ConfigScreen()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ConfigScreen()));
                 },
-
               ),
               const PopupMenuItem<Menu>(
                 value: Menu.itemFour,
@@ -140,7 +171,9 @@ class MenuLista extends StatelessWidget {
   final IconData icono;
   final String texto;
   const MenuLista({
-    super.key, required this.icono, required this.texto,
+    super.key,
+    required this.icono,
+    required this.texto,
   });
 
   @override

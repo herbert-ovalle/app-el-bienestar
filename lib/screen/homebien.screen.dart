@@ -1,3 +1,4 @@
+import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/component/z_component.dart';
 import 'package:app_bienestar/screen/login.screen.dart';
 import 'package:app_bienestar/services/qExterno.service.dart';
@@ -87,44 +88,7 @@ class HomeBienestar extends StatelessWidget {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.monetization_on_outlined,
-                              color:
-                                  Colors.green.shade700, // Ícono representativo
-                              size: 30,
-                            ),
-                            const SizedBox(width: 8),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Tasa de Cambio:",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green
-                                        .shade700, // Texto principal llamativo
-                                  ),
-                                ),
-                                Text(
-                                  "7.60",
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors
-                                        .green.shade900, // Valor destacado
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        _CurrentDateTimeWidget()
-                      ],
+                      children: [TasaCambioP(), _CurrentDateTimeWidget()],
                     ),
                   ),
                 ),
@@ -153,8 +117,7 @@ class HomeBienestar extends StatelessWidget {
                       _OpcionDos(
                           assetsvg: "assets/locationAge.svg",
                           titulo: "Agencias",
-                          onTap: (value) async {
-                            await PeticionesExternas().postTasaCambio();
+                          onTap: (value) {
                           }),
                       _OpcionDos(
                           assetsvg: "assets/loginsvg.svg",
@@ -174,6 +137,64 @@ class HomeBienestar extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class TasaCambioP extends StatelessWidget {
+  const TasaCambioP({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: PeticionesExternas().postTasaCambio(),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.hasData) {
+             return Row
+             (
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.monetization_on_outlined,
+                  color: Colors.green.shade700, // Ícono representativo
+                  size: 30,
+                ),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Tasa de Cambio:",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color:
+                            Colors.green.shade700, // Texto principal llamativo
+                      ),
+                    ),
+                    Text(
+                      snapshot.data ?? "0",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade900, // Valor destacado
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          } else if (snapshot.hasError) {
+            return Center(child: Text("N/D"));
+          }
+          else{
+           return Center(child: Column( children : <Widget>[
+              SizedBox(width: 20, height: 20, child: CircularProgressIndicator()),
+              Padding(padding: EdgeInsets.only(top: 14), child: Text('Actualizando tasa cambio...')),
+            ]));
+          }
+      });
   }
 }
 
@@ -335,13 +356,12 @@ class _MisProductosBieState extends State<_MisProductosBie> {
 }
 
 class _OpcionDos extends StatelessWidget {
-  final IconData? icono;
   final String titulo;
   final String? assetsvg;
   final Function(TapDownDetails valor) onTap;
 
   const _OpcionDos(
-      {this.icono, required this.titulo, this.assetsvg, required this.onTap});
+      { required this.titulo, this.assetsvg, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -362,12 +382,7 @@ class _OpcionDos extends StatelessWidget {
             children: [
               if (assetsvg != null)
                 SvgPicture.asset(assetsvg ?? "", height: 48, width: 48),
-              if (icono != null)
-                Icon(
-                  icono,
-                  size: 48,
-                  color: Colors.blue.shade700, // Ícono blanco
-                ),
+
               Text(
                 titulo,
                 textAlign: TextAlign.center,
@@ -423,12 +438,12 @@ class _IconosProducto extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                backgroundColor: Colors.white,
+                backgroundColor: Preferences.isDarkmode ? Colors.black : Colors.white,
                 maxRadius: 40,
                 child: Icon(
                   icono,
                   size: 72,
-                  color: Colors.blue.shade700,
+                  color: Preferences.isDarkmode ? Colors.white : Colors.blue.shade700,
                 ),
               ),
               const SizedBox(height: 5),
@@ -494,12 +509,12 @@ class _CurrentDateTimeWidgetState extends State<_CurrentDateTimeWidget> {
               ),
               Text(
                 snapshot.data!,
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.black),
               ),
             ],
           );
         } else {
-          return Text("Loading...", style: TextStyle(fontSize: 18));
+          return Text("Actualizando...", style: TextStyle(fontSize: 18));
         }
       },
     );

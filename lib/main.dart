@@ -1,37 +1,33 @@
+import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/providers/registro_user.dart';
+import 'package:app_bienestar/themes/tema_app.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screen/screen.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Preferences.init();
+  
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(
+        create: (_) => ThemeProvider(isDarkmode: Preferences.isDarkmode))
+  ], child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
-
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-         ChangeNotifierProvider(create: (BuildContext context) => DatosUsuarioProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => DatosUsuarioProvider()),
       ],
       child: MaterialApp(
         title: 'Aplicación del Bienestar',
-        theme: ThemeData(
-          primarySwatch: Colors.red, 
-          appBarTheme: AppBarTheme(
-            backgroundColor: const Color.fromARGB(255, 1, 2, 58),
-            foregroundColor: Colors.white,
-            centerTitle: true,
-            titleTextStyle: TextStyle(
-              color: Colors.white,
-              fontSize: 25,
-            ),
-            iconTheme: IconThemeData(color: Colors.white),
-          ),
-        ),
+        theme: Provider.of<ThemeProvider>(context).currentTheme,
         debugShowCheckedModeBanner: false,
         home: const HomeScreen(),
         initialRoute: "/home",
