@@ -151,14 +151,14 @@ class _ProfileIcon extends StatelessWidget {
                           builder: (context) => FormularioComponent()));
                 },
               ),
-              PopupMenuItem<Menu>(
+              /*PopupMenuItem<Menu>(
                 value: Menu.itemThree,
                 child: MenuLista(icono: Icons.settings, texto: 'Configuración'),
                 onTap: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => ConfigScreen()));
                 },
-              ),
+              ),*/
               const PopupMenuItem<Menu>(
                 value: Menu.itemFour,
                 child: MenuLista(icono: Icons.exit_to_app, texto: 'Salir'),
@@ -181,7 +181,7 @@ class MenuLista extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icono),
+        Icon(icono, color: Preferences.isDarkmode ? Colors.white : null),
         SizedBox(
           width: 10,
         ),

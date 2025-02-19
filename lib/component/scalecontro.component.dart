@@ -1,3 +1,4 @@
+import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/component/formulario.component.dart';
 import 'package:flutter/material.dart';
 
@@ -55,12 +56,12 @@ class _RegistroButtonState extends State<RegistroButton>
           scale: _scaleAnimation,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.blueAccent, // Color vibrante
+              color: Preferences.isDarkmode ? Colors.blue[600] : Colors.blueAccent, // Color vibrante
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
                   // ignore: deprecated_member_use
-                  color: Colors.blueAccent.withOpacity(0.5),
+                  color:  Colors.blueAccent.withOpacity(0.5),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),

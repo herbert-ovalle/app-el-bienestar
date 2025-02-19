@@ -1,3 +1,4 @@
+import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:flutter/material.dart';
 
 class ProductosScreen extends StatelessWidget {
@@ -15,41 +16,46 @@ class ProductosScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(tituloAppBar, style: TextStyle(fontSize: 20)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Image(
-              image: AssetImage("assets/LOGO_AZUL.png"),
-              height: 50,
-            ),
-            TextButton(
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
+      body: InteractiveViewer(
+        boundaryMargin: const EdgeInsets.all(10.0),
+        minScale: 0.1,
+        maxScale: 1.6,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Image(
+                image: AssetImage(Preferences.isDarkmode ? "assets/LOGO_BLANCO.png" : "assets/LOGO_AZUL.png"),
+                height: 50,
               ),
-              onPressed: () {},
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.link,
-                    color: Colors.white,
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text('Solicite su $tituloAppBar',
-                      style: TextStyle(color: Colors.white)),
-                ],
+              TextButton(
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
+                ),
+                onPressed: () {},
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.link,
+                      color: Colors.white,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text('Solicite $tituloAppBar',
+                        style: TextStyle(color: Colors.white)),
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: debolverProducto(tipo)
+              Expanded(
+                child: SingleChildScrollView(
+                  child: debolverProducto(tipo)
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -274,11 +280,16 @@ class InformacionProducto extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(titulo,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+        Divider(),
+        Text(titulo.toUpperCase(),
+            style: TextStyle(fontWeight: FontWeight.bold, 
+                fontSize: 22, 
+                )),
+        Divider(),
         Text(
           descripcion,
           textAlign: TextAlign.justify,
+          style: TextStyle(fontSize: 16),
         ),
         Image(
           image: AssetImage(imagen),

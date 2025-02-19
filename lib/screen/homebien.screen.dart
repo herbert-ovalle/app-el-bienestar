@@ -1,6 +1,7 @@
 import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/component/z_component.dart';
 import 'package:app_bienestar/screen/login.screen.dart';
+import 'package:app_bienestar/screen/map.screen.dart';
 import 'package:app_bienestar/services/qExterno.service.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -75,12 +76,12 @@ class HomeBienestar extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     decoration: BoxDecoration(
-                      color: Colors.green.shade100, // Fondo suave para destacar
+                      color: Preferences.isDarkmode ? Colors.blue[100] : Colors.green.shade100,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
                           // ignore: deprecated_member_use
-                          color: Colors.green.shade300.withOpacity(0.5),
+                          color: Preferences.isDarkmode ? Colors.transparent : Colors.green.shade300.withOpacity(0.5),
                           blurRadius: 8,
                           offset: Offset(0, 4), // Sombra para destacar
                         ),
@@ -118,6 +119,10 @@ class HomeBienestar extends StatelessWidget {
                           assetsvg: "assets/locationAge.svg",
                           titulo: "Agencias",
                           onTap: (value) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MapSample()));
                           }),
                       _OpcionDos(
                           assetsvg: "assets/loginsvg.svg",
@@ -151,34 +156,27 @@ class TasaCambioP extends StatelessWidget {
         future: PeticionesExternas().postTasaCambio(),
         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
           if (snapshot.hasData) {
-             return Row
-             (
+             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.monetization_on_outlined,
-                  color: Colors.green.shade700, // Ícono representativo
-                  size: 30,
-                ),
-                const SizedBox(width: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Tasa de Cambio:",
+                      "Tasa de Cambio Oficial:", // Descripción más clara
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color:
-                            Colors.green.shade700, // Texto principal llamativo
+                        color: Colors.green.shade700,
                       ),
                     ),
                     Text(
-                      snapshot.data ?? "0",
+                      "\$ 1 = Q ${snapshot.data ?? "0.00"}", // Agregando símbolo de dólar y formato decimal
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize:
+                            22, // Tamaño más grande para destacar la cifra
                         fontWeight: FontWeight.bold,
-                        color: Colors.green.shade900, // Valor destacado
+                        color: Colors.green.shade900,
                       ),
                     ),
                   ],
@@ -371,7 +369,7 @@ class _OpcionDos extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(horizontal: 5),
-        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: Preferences.isDarkmode ? Colors.white : Colors.grey[100]),
         child: CircleAvatar(
           maxRadius: 40,
           backgroundColor:
@@ -389,7 +387,7 @@ class _OpcionDos extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue.shade700, // Texto blanco
+                  color: Preferences.isDarkmode ? Colors.redAccent : Colors.blue.shade700, // Texto blanco
                 ),
               ),
             ],
@@ -431,14 +429,14 @@ class _IconosProducto extends StatelessWidget {
           height: 125,
           width: 140,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.0), color: Colors.white),
+              borderRadius: BorderRadius.circular(12.0), color: Preferences.isDarkmode ? Colors.white : Colors.grey[100]),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                backgroundColor: Preferences.isDarkmode ? Colors.black : Colors.white,
+                backgroundColor: Preferences.isDarkmode ? Colors.black54 : Colors.white,
                 maxRadius: 40,
                 child: Icon(
                   icono,
@@ -455,7 +453,7 @@ class _IconosProducto extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue.shade700,
+                  color: Preferences.isDarkmode ? Colors.black54 : Colors.blue.shade700,
                 ),
               )
             ],

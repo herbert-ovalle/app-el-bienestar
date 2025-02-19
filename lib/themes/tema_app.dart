@@ -11,7 +11,7 @@ class AppTheme {
       label: RichText(
         text: TextSpan(
           text: label,
-          style: TextStyle(color: Preferences.isDarkmode ? null : Colors.black, fontSize: 18,),
+          style: TextStyle(color: Preferences.isDarkmode ? null : Colors.black, fontSize: 18, fontWeight: Preferences.isDarkmode ? FontWeight.bold : null),
           children: [
             if (requerido)
               TextSpan(
@@ -28,7 +28,7 @@ class AppTheme {
           TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.bold),
       hintStyle: TextStyle(color: Colors.grey.shade500),
       filled: true,
-      fillColor:  Preferences.isDarkmode ? Colors.grey.shade500 : Colors.white,
+      fillColor:  Preferences.isDarkmode ? Colors.grey.shade600 : Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(color: Colors.blue.shade300, width: 1),
@@ -81,7 +81,23 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   static ThemeData setDarkmode() {
-    return ThemeData.dark().copyWith(
+    return ThemeData(
+      brightness: Brightness.dark, // Modo oscuro
+      scaffoldBackgroundColor: const Color.fromARGB(211, 27, 27, 27), // Fondo más oscuro
+      colorScheme: const ColorScheme.dark(
+        //primary: Colors.blueGrey,
+        secondary: Colors.teal,
+        surface: Colors.black,
+      ),
+       appBarTheme: AppBarTheme(
+        backgroundColor: Colors.grey[900],
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+    );
+    /*return ThemeData.dark().copyWith(
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
@@ -91,7 +107,7 @@ class ThemeProvider extends ChangeNotifier {
       ),
       scaffoldBackgroundColor: Colors.black,
       textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white)),
-    );
+    );*/
   }
 
   void toggleTheme() {
