@@ -372,8 +372,7 @@ class _OpcionDos extends StatelessWidget {
         decoration: BoxDecoration(shape: BoxShape.circle, color: Preferences.isDarkmode ? Colors.white : Colors.grey[100]),
         child: CircleAvatar(
           maxRadius: 40,
-          backgroundColor:
-              Colors.transparent, // Fondo transparente para gradiente
+          backgroundColor: Preferences.isDarkmode ? Colors.black26 : Colors.transparent,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -385,9 +384,9 @@ class _OpcionDos extends StatelessWidget {
                 titulo,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: FontWeight.bold,
-                  color: Preferences.isDarkmode ? Colors.redAccent : Colors.blue.shade700, // Texto blanco
+                  color: Preferences.isDarkmode ? Colors.green : Colors.blue.shade700, // Texto blanco
                 ),
               ),
             ],
