@@ -83,7 +83,7 @@ class ThemeProvider extends ChangeNotifier {
   static ThemeData setDarkmode() {
     return ThemeData(
       brightness: Brightness.dark, // Modo oscuro
-      scaffoldBackgroundColor: const Color.fromARGB(211, 27, 27, 27), // Fondo más oscuro
+      scaffoldBackgroundColor: const Color.fromARGB(255, 39, 39, 39), // Fondo más oscuro
       colorScheme: const ColorScheme.dark(
         //primary: Colors.blueGrey,
         secondary: Colors.teal,
@@ -97,17 +97,6 @@ class ThemeProvider extends ChangeNotifier {
         iconTheme: IconThemeData(color: Colors.white),
       ),
     );
-    /*return ThemeData.dark().copyWith(
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        centerTitle: true,
-        titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
-      scaffoldBackgroundColor: Colors.black,
-      textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white)),
-    );*/
   }
 
   void toggleTheme() {
