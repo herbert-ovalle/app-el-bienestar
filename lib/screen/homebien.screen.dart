@@ -387,7 +387,7 @@ class _OpcionDos extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double tamanosvg = Preferences.isDarkmode ? 40 : 42;
+    double tamanosvg = Preferences.isDarkmode ? 35 : 40;
 
     return GestureDetector(
       onTapDown: onTap,

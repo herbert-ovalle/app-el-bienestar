@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/component/pageview.component.dart';
 import 'package:app_bienestar/services/z_service.dart';
 
 import 'package:async_button_builder/async_button_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MusicPlayerScreen extends StatefulWidget {
   const MusicPlayerScreen({super.key});
@@ -45,8 +47,7 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
   }
 
   @override
-  void didUpdateWidget(MusicPlayerScreen oldWidget) async {
-    //_volume = await ReproductorMusic().obtenerVolumen();
+  void didUpdateWidget(MusicPlayerScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
   }
 
@@ -74,7 +75,7 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
     _startColorChangeAnimation();
     setState(() {
       _isPlaying = true;
-      //_playPauseController.forward();
+      _playPauseController.forward();
     });
   }
 
@@ -120,100 +121,169 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return Center(
-      child: Column(
-        children: [
-          SizedBox(height: screenHeight * 0.35, child: PageViewExample(
-            lstTitulos: [
-              "Ahorros el Bienestar",
-              "Prestamos el Bienestar",
-              "Seguros Columna",
-              "Remesas el Bienestar",
-            ], lstImagenes: [
-              "assets/Productos-Ahorro.png",
-              "assets/Prestamos-El-Bienestar.png",
-              "assets/Seguros-Columna.png",
-              "assets/Remesas.png",
-            ],)),
-          SizedBox(height: 20),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-            height: _isPlaying ? 120 : 100,
-            width: _isPlaying ? 120 : 100,
-            decoration: BoxDecoration(
-              // ignore: deprecated_member_use
-              color: _currentColor.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.music_note, size: 60, color: Colors.blue),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'Radio Cooperativa el Bienestar en vivo',
-            style: TextStyle(fontSize: 18),
-          ),
-          const SizedBox(height: 15),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
+      children: [
+        SizedBox(height: screenHeight * 0.35, child: PageViewExample(
+          lstTitulos: [
+            "Ahorros el Bienestar",
+            "Prestamos el Bienestar",
+            "Seguros Columna",
+            "Remesas el Bienestar",
+          ], lstImagenes: [
+            "assets/Productos-Ahorro.png",
+            "assets/Prestamos-El-Bienestar.png",
+            "assets/Seguros-Columna.png",
+            "assets/Remesas.png",
+          ],)),
+        SizedBox(height: 10),
+    
+        Expanded(
+          child: Stack(
             children: [
-              AsyncButtonBuilder(
-                loadingWidget: Text('Cargando...'),
-                onPressed: _isPlaying ? pauseMusic : playMusic,
-                builder: (context, child, callback, buttonState) {
-                  final buttonColor = buttonState.when(
-                    idle: () => Colors.transparent,
-                    loading: () => Colors.grey,
-                    success: () => Colors.green,
-                    error: (err, stack) => Colors.orange,
-                  );
-                  return IconButton(
-                    iconSize: 50,
-                    icon: AnimatedIcon(
-                      icon: _isPlaying
-                          ? AnimatedIcons.pause_play
-                          : AnimatedIcons.play_pause,
-                      progress: _playPauseController,
-                    ),
-                    onPressed: callback,
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(buttonColor),
-                      shape: WidgetStateProperty.all(CircleBorder()),
-                    ),
-                  );
-                },
-                child: const Text(''),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: Preferences.isDarkmode ? [const Color.fromARGB(255, 35, 35, 35),
+                            Color.fromARGB(255, 31, 31, 31) ] : [Color(0xFF2196F3), Color(0xFF64B5F6)],
+                  ),
+                ),
               ),
-           
-              const SizedBox(width: 20),
-              IconButton(
-                icon: Icon(Icons.stop, size: 40),
-                onPressed: stopMusic,
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(height: 10),
+                  Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            // ignore: deprecated_member_use
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child:  AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                        height: _isPlaying ? 120 : 100,
+                        width: _isPlaying ? 120 : 100,
+                        decoration: BoxDecoration(
+                          // ignore: deprecated_member_use
+                          color: _currentColor.withOpacity(0.2),
+
+                        ),
+                        child: Icon(
+                          Icons.radio,
+                          size: 100,
+                          // ignore: deprecated_member_use
+                          color: _currentColor.withOpacity(0.2),
+                        ),
+                      ),
+                    ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Radio cooperativa el bienestar",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const Text(
+                    "Estamos en linea...",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AsyncButtonBuilder(
+                        loadingWidget: Text('Cargando...'),
+                        onPressed: _isPlaying ? pauseMusic : playMusic,
+                        builder: (context, child, callback, buttonState) {
+                          final buttonColor = buttonState.when(
+                            idle: () => Colors.transparent,
+                            loading: () => Colors.grey,
+                            success: () => Colors.green,
+                            error: (err, stack) => Colors.orange,
+                          );
+                          return IconButton(
+                            iconSize: 50,
+                            icon: AnimatedIcon(
+                              icon: _isPlaying
+                                  ? AnimatedIcons.pause_play
+                                  : AnimatedIcons.play_pause,
+                              progress: _playPauseController,
+                            ),
+                            onPressed: callback,
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(buttonColor),
+                              shape: WidgetStateProperty.all(CircleBorder()),
+                            ),
+                          );
+                        },
+                        child: const Text(''),
+                      ),
+                      const SizedBox(width: 20),
+                      IconButton(
+                        icon: Icon(Icons.stop, size: 40),
+                        onPressed: stopMusic,
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        valueIndicatorTextStyle: const TextStyle(
+                          color: Colors.black, 
+                          fontWeight: FontWeight.bold,
+                        ),
+                        valueIndicatorColor: Colors.blueAccent,
+                      ),
+                      child: Slider(
+                        value: _volume,
+                        min: 0.0,
+                        max: 1.0,
+                        onChanged: changeVolume,
+                        divisions: 10,
+                        label: '${(_volume * 100).toInt()}%',
+                        activeColor: Colors.white,
+                        inactiveColor: Colors.white30,
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _socialIcon(FontAwesomeIcons.instagram),
+                      _socialIcon(FontAwesomeIcons.twitter),
+                      _socialIcon(FontAwesomeIcons.facebook),
+                      _socialIcon(FontAwesomeIcons.globe),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 15),
-          // Control de volumen con Slider
-          Column(
-            children: [
-              Text(
-                'Volumen',
-                style: TextStyle(fontSize: 16),
-              ),
-              Slider(
-                value: _volume,
-                min: 0.0,
-                max: 1.0,
-                onChanged: changeVolume,
-                divisions: 10,
-                label: '${(_volume * 100).toInt()}%',
-                activeColor: Colors.blue,
-                inactiveColor: Colors.grey,
-              ),
-            ],
-          ),
-        ],
-      ),
+        ),
+      ],
+    );
+  }
+  
+   Widget _socialIcon(IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Icon(icon, color: Colors.white, size: 30),
     );
   }
 }

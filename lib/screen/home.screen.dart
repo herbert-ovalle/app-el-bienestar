@@ -1,6 +1,7 @@
 import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/component/formulario.component.dart';
 import 'package:app_bienestar/component/radio.component.dart';
+import 'package:app_bienestar/component/radionuevo.component.dart';
 import 'package:app_bienestar/screen/config.screen.dart';
 import 'package:app_bienestar/screen/homebien.screen.dart';
 import 'package:app_bienestar/screen/login.screen.dart';
@@ -107,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return MusicPlayerScreen();
       case 2:
         return const Center(
-          child: Text("Busqueda"),
+          child: RadioPlayerScreen(),
         );
       case 3:
         return ConfigScreen();
