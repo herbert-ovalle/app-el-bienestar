@@ -34,10 +34,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void didUpdateWidget(covariant HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
     setState(() {
       _updateNavBarItems();
     });
-    super.didUpdateWidget(oldWidget);
+
   }
 
   void _updateNavBarItems() {

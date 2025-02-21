@@ -467,7 +467,7 @@ class _IconosProducto extends StatelessWidget {
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.0),
               color: Preferences.isDarkmode
-                  ? const Color.fromARGB(171, 117, 117, 117)
+                  ? const Color.fromARGB(165, 105, 105, 105)
                   : Colors.grey[100]),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -484,13 +484,13 @@ class _IconosProducto extends StatelessWidget {
                 ),
                 child: CircleAvatar(
                   backgroundColor:
-                      Preferences.isDarkmode ? Colors.grey[900] : Colors.white,
+                      Preferences.isDarkmode ? Colors.blue[800] : Colors.white,
                   maxRadius: 40,
                   child: Icon(
                     icono,
                     size: 72,
                     color: Preferences.isDarkmode
-                        ? Colors.blue[600]
+                        ? Colors.white
                         : Colors.blue.shade700,
                   ),
                 ),

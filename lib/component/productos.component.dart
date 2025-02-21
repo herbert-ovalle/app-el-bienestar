@@ -23,6 +23,7 @@ class ProductosScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
+            mainAxisSize: MainAxisSize.max,
             children: [
               Image(
                 image: AssetImage(Preferences.isDarkmode ? "assets/LOGO_BLANCO.png" : "assets/LOGO_AZUL.png"),
@@ -51,7 +52,19 @@ class ProductosScreen extends StatelessWidget {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  child: debolverProducto(tipo)
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          gradient:Preferences.isDarkmode ? LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: <Color>[Colors.orange, Colors.red],
+                            stops: <double>[0.0, 1.0],
+                          ): null,
+                        
+                        ),
+                    child: debolverProducto(tipo))
                 ),
               ),
             ],

@@ -83,14 +83,14 @@ class ThemeProvider extends ChangeNotifier {
   static ThemeData setDarkmode() {
     return ThemeData(
       brightness: Brightness.dark, // Modo oscuro
-      scaffoldBackgroundColor: const Color.fromARGB(255, 39, 39, 39), // Fondo más oscuro
+      scaffoldBackgroundColor: const Color.fromARGB(255, 38, 38, 38), // Fondo más oscuro
       colorScheme: const ColorScheme.dark(
         //primary: Colors.blueGrey,
         secondary: Colors.teal,
         surface: Colors.black,
       ),
        appBarTheme: AppBarTheme(
-        backgroundColor: Colors.grey[900],
+        backgroundColor: Colors.grey[850],
         foregroundColor: Colors.white,
         centerTitle: true,
         titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
