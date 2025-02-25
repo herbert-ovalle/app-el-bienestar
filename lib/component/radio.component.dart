@@ -31,7 +31,7 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
   Color _currentColor = Colors.blue;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _playPauseController = AnimationController(
       vsync: this,
@@ -39,11 +39,7 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
     );
 
     _checkInitialState();
-    ReproductorMusic().obtenerVolumen().then(
-      (volumen) => {
-        _volume = volumen
-    });
-
+    ReproductorMusic().obtenerVolumen().then((volumen) => {_volume = volumen});
   }
 
   @override
@@ -54,17 +50,21 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
   @override
   void dispose() {
     _playPauseController.dispose();
-    if(_isPlaying){
-        _colorChangeTimer.cancel(); 
+    if (_isPlaying) {
+      _colorChangeTimer.cancel();
     }
     super.dispose();
   }
 
   Future<void> _checkInitialState() async {
     bool isPlaying = await ReproductorMusic().validarReproductor();
-    if(isPlaying){
-       _startColorChangeAnimation();
+    if (isPlaying) {
+      _startColorChangeAnimation();
+      _playPauseController.forward();
+    } else {
+      _playPauseController.reverse();
     }
+
     setState(() {
       _isPlaying = isPlaying;
     });
@@ -75,26 +75,26 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
     _startColorChangeAnimation();
     setState(() {
       _isPlaying = true;
-      _playPauseController.forward();
     });
+    _playPauseController.forward();
   }
 
   Future<void> stopMusic() async {
     await ReproductorMusic().stopMusic();
-     _colorChangeTimer.cancel();
+    _colorChangeTimer.cancel();
     setState(() {
       _isPlaying = false;
-      _playPauseController.reverse();
     });
+    _playPauseController.reverse();
   }
 
   Future<void> pauseMusic() async {
     await ReproductorMusic().pauseMusic();
-     _colorChangeTimer.cancel();
+    _colorChangeTimer.cancel();
     setState(() {
       _isPlaying = false;
-      _playPauseController.reverse();
     });
+    _playPauseController.reverse();
   }
 
   void changeVolume(double value) async {
@@ -116,27 +116,29 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Column(
       children: [
-        SizedBox(height: screenHeight * 0.35, child: PageViewExample(
-          lstTitulos: [
-            "Ahorros el Bienestar",
-            "Prestamos el Bienestar",
-            "Seguros Columna",
-            "Remesas el Bienestar",
-          ], lstImagenes: [
-            "assets/Productos-Ahorro.png",
-            "assets/Prestamos-El-Bienestar.png",
-            "assets/Seguros-Columna.png",
-            "assets/Remesas.png",
-          ],)),
+        SizedBox(
+            height: screenHeight * 0.35,
+            child: PageViewExample(
+              lstTitulos: [
+                "Ahorros el Bienestar",
+                "Prestamos el Bienestar",
+                "Seguros Columna",
+                "Remesas el Bienestar",
+              ],
+              lstImagenes: [
+                "assets/Productos-Ahorro.png",
+                "assets/Prestamos-El-Bienestar.png",
+                "assets/Seguros-Columna.png",
+                "assets/Remesas.png",
+              ],
+            )),
         SizedBox(height: 10),
-    
         Expanded(
           child: Stack(
             children: [
@@ -147,8 +149,12 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: Preferences.isDarkmode ? [const Color.fromARGB(255, 35, 35, 35),
-                            Color.fromARGB(255, 31, 31, 31) ] : [Color(0xFF2196F3), Color(0xFF64B5F6)],
+                    colors: Preferences.isDarkmode
+                        ? [
+                            const Color.fromARGB(255, 35, 35, 35),
+                            Color.fromARGB(255, 31, 31, 31)
+                          ]
+                        : [Color(0xFF2196F3), Color(0xFF64B5F6)],
                   ),
                 ),
               ),
@@ -157,36 +163,31 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
                 children: [
                   SizedBox(height: 10),
                   Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            // ignore: deprecated_member_use
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 10,
-                          ),
-                        ],
-                      ),
-                      child:  AnimatedContainer(
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
-                        height: _isPlaying ? 120 : 100,
-                        width: _isPlaying ? 120 : 100,
-                        decoration: BoxDecoration(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
                           // ignore: deprecated_member_use
-                          color: _currentColor.withOpacity(0.2),
-
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 10,
                         ),
-                        child: Icon(
-                          Icons.radio,
-                          size: 100,
-                          // ignore: deprecated_member_use
-                          color: _currentColor.withOpacity(0.2),
-                        ),
+                      ],
+                    ),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                      height: _isPlaying ? 120 : 100,
+                      width: _isPlaying ? 120 : 100,
+                      child: Icon(
+                        Icons.radio,
+                        size: 100,
+                        // ignore: deprecated_member_use
+                        color: _currentColor.withOpacity(0.8),
                       ),
                     ),
+                  ),
                   const SizedBox(height: 10),
                   const Text(
                     "Radio cooperativa el bienestar",
@@ -219,14 +220,13 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
                           return IconButton(
                             iconSize: 50,
                             icon: AnimatedIcon(
-                              icon: _isPlaying
-                                  ? AnimatedIcons.pause_play
-                                  : AnimatedIcons.play_pause,
+                              icon: AnimatedIcons.play_pause,
                               progress: _playPauseController,
                             ),
                             onPressed: callback,
                             style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all(buttonColor),
+                              backgroundColor:
+                                  WidgetStateProperty.all(buttonColor),
                               shape: WidgetStateProperty.all(CircleBorder()),
                             ),
                           );
@@ -245,7 +245,7 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
                     child: SliderTheme(
                       data: SliderTheme.of(context).copyWith(
                         valueIndicatorTextStyle: const TextStyle(
-                          color: Colors.black, 
+                          color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
                         valueIndicatorColor: Colors.blueAccent,
@@ -279,8 +279,8 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
       ],
     );
   }
-  
-   Widget _socialIcon(IconData icon) {
+
+  Widget _socialIcon(IconData icon) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Icon(icon, color: Colors.white, size: 30),

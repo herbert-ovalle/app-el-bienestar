@@ -1,7 +1,8 @@
-
 import 'package:app_bienestar/models/z_model.dart';
+import 'package:app_bienestar/providers/guardar_usuario.dart';
 import 'package:app_bienestar/providers/registro_user.dart';
 import 'package:app_bienestar/themes/tema_app.dart';
+import 'package:async_button_builder/async_button_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -193,32 +194,50 @@ class _FormularioComponentState extends State<FormularioComponent> {
     final datoUser = Provider.of<DatosUsuarioProvider>(context);
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
-        onPressed: () {
+      child: AsyncButtonBuilder(
+        onPressed: () async {
           if (_formKey.currentState!.validate()) {
             FocusScope.of(context).unfocus();
             final datUser = RegistroUsuario.fromJson(datoUser.datosUsuario);
             debugPrint(datUser.toRawJson());
-            // Aquí podrías enviar los datos a un backend o hacer otra acción
+
+            final res =
+                await UsuarioAsociadoN().guardarAsociado(datUser.toJson());
+
+            // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Registro exitoso")),
+              SnackBar(content: Text(res.mensaje)),
             );
           }
         },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.save, color: Colors.white),
-            SizedBox(
-              width: 5,
+        builder: (BuildContext context, Widget child,
+            Future<void> Function()? callback, ButtonState buttonState) {
+          final buttonColor = buttonState.when(
+            idle: () => Colors.blue,
+            loading: () => Colors.grey,
+            success: () => Colors.green,
+            error: (err, stack) => Colors.orange,
+          );
+
+          return ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: buttonColor),
+            onPressed: callback,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.save, color: Colors.white),
+                SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  "Registrar",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
             ),
-            Text(
-              "Registrar",
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
+          );
+        },
+        child: Text("Guardar usuario"),
       ),
     );
   }

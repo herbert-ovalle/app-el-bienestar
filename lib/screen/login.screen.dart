@@ -1,4 +1,9 @@
+import 'package:app_bienestar/models/z_model.dart';
+import 'package:app_bienestar/providers/guardar_usuario.dart';
+import 'package:async_button_builder/async_button_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
 class BankLoginScreen extends StatefulWidget {
   const BankLoginScreen({super.key});
 
@@ -15,26 +20,23 @@ class _BankLoginScreenState extends State<BankLoginScreen> {
   @override
   Widget build(BuildContext context) {
     double higth = MediaQuery.of(context).size.height;
-     return Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        backgroundColor:Color.fromARGB(255, 71, 71, 71),
+        backgroundColor: Color.fromARGB(255, 71, 71, 71),
       ),
       // ignore: deprecated_member_use
       backgroundColor: const Color.fromARGB(255, 71, 71, 71),
       body: Stack(
         children: [
-
           SingleChildScrollView(
             child: Padding(
-              padding: EdgeInsets.only(right: 24, left: 24, top: (higth * 0.15)),
+              padding:
+                  EdgeInsets.only(right: 24, left: 24, top: (higth * 0.15)),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-              
                   Image.asset("assets/LOGO_BLANCO.png"),
-          
                   const SizedBox(height: 40),
-
                   Form(
                     key: _formKey,
                     child: Column(
@@ -50,20 +52,28 @@ class _BankLoginScreenState extends State<BankLoginScreen> {
                             if (value == null || value.isEmpty) {
                               return "Ingrese su DPI";
                             }
+                             if (
+                                value.length < 13) {
+                              return "El campo CUI es obligatorio con 13 digitos";
+                            }
                             return null;
                           },
+                          inputFormatters: [
+                            MaskTextInputFormatter(
+                                mask: '#### ##### ####',
+                                type: MaskAutoCompletionType.lazy)
+                          ],
                         ),
-          
+
                         const SizedBox(height: 16),
-          
+
                         // Campo Contraseña
                         TextFormField(
                           controller: _passwordController,
                           obscureText: !_isPasswordVisible,
                           style: const TextStyle(color: Colors.white),
-                          decoration:
-                              _inputDecoration("Contraseña", Icons.lock)
-                                  .copyWith(
+                          decoration: _inputDecoration("Contraseña", Icons.lock)
+                              .copyWith(
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _isPasswordVisible
@@ -88,31 +98,43 @@ class _BankLoginScreenState extends State<BankLoginScreen> {
                             return null;
                           },
                         ),
-          
+
                         const SizedBox(height: 20),
-          
+
                         // Botón de Login
-                        ElevatedButton(
-                          onPressed: _login,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.greenAccent[700],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 100, vertical: 16),
-                          ),
-                          child: const Text(
-                            "Ingresar",
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                        ),
-          
+                        AsyncButtonBuilder(
+                            onPressed: _login,
+                            builder: (context, child, callback, buttonState) {
+                              final buttonColor = buttonState.when(
+                                idle: () => Colors.greenAccent[700],
+                                loading: () => Colors.grey,
+                                success: () => Colors.green,
+                                error: (err, stack) => Colors.orange,
+                              );
+
+                              return ElevatedButton(
+                                onPressed: callback,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: buttonColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 100, vertical: 16),
+                                ),
+                                child: const Text(
+                                  "Ingresar",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                ),
+                              );
+                            },
+                            child: Text("consultar")),
+
                         const SizedBox(height: 16),
-          
+
                         // "Olvidaste tu contraseña?"
                         GestureDetector(
                           onTap: () {
@@ -143,7 +165,10 @@ class _BankLoginScreenState extends State<BankLoginScreen> {
   }
 
   // Estilo de los campos de entrada
-  InputDecoration _inputDecoration(String label, IconData icon) {
+  InputDecoration _inputDecoration(
+    String label,
+    IconData icon,
+  ) {
     return InputDecoration(
       labelText: label,
       labelStyle: const TextStyle(color: Colors.white),
@@ -159,10 +184,22 @@ class _BankLoginScreenState extends State<BankLoginScreen> {
   }
 
   // Función de Login
-  void _login() {
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
+      final datosLogin = LoginModel.fromJson( {
+        "usuario": _userController.text,
+        "contrasena": _passwordController.text
+      });
+      print(datosLogin.toJson());
+      Respuesta res = await UsuarioAsociadoN().loginAsociado(datosLogin.toJson());
+      if(res.respuesta == "success"){
+        // ignore: use_build_context_synchronously
+        Navigator.pushNamed(context, "home");
+      }
+      print(res.toJson());
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Inicio de sesión exitoso")),
+        SnackBar(content: Text(res.mensaje)),
       );
     }
   }

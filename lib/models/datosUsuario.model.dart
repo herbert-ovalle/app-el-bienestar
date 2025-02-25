@@ -47,3 +47,34 @@ class RegistroUsuario {
         "contrasena": contrasena,
       };
 }
+
+
+
+
+class LoginModel {
+
+  final String usuario;
+  final String contrasena;
+
+  LoginModel({
+    required this.usuario,
+    required this.contrasena,
+  });
+
+  factory LoginModel.fromRawJson(String str) =>
+      LoginModel.fromJson(json.decode(str));
+
+  factory LoginModel.fromJson(Map<String, dynamic> json) =>
+      LoginModel(
+
+        usuario: json["usuario"].replaceAll(" ", ""),
+        contrasena: encriptarContrasena(json["contrasena"]),
+      );
+
+      Map<String, dynamic> toJson() => {
+        "usuario": usuario,
+        "contrasena": contrasena,
+      };
+
+  
+}

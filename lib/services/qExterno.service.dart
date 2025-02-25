@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:app_bienestar/class/enviroment.dart';
-import 'package:app_bienestar/models/generales.model.dart';
+import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/services/servilocal.services.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:http/http.dart' as http;
@@ -15,7 +15,7 @@ class PeticionesExternas extends EnvitomentsQuery {
     if (tasaCam.isNotEmpty) {
       final gTasa = TasaCambioM.fromRawJson(tasaCam);
 
-      if (compararFechas(DateTime.parse(gTasa.fecha),DateTime.now())) {
+      if (compararFechas(DateTime.parse(gTasa.fecha), DateTime.now())) {
         return actualizarTasaCam();
       } else {
         return gTasa.tasaCambio;
@@ -95,11 +95,34 @@ class PeticionesExternas extends EnvitomentsQuery {
   }
 
   bool compararFechas(DateTime fecha1, DateTime fecha2) {
-
     DateTime soloFecha1 = DateTime(fecha1.year, fecha1.month, fecha1.day);
     DateTime soloFecha2 = DateTime(fecha2.year, fecha2.month, fecha2.day);
 
     return soloFecha1.isBefore(soloFecha2);
   }
 
+  Future<Respuesta> query(
+      {required String url, required Map<String, dynamic> body}) async {
+    Respuesta respuesta;
+    var client = http.Client();
+    final headers = {'Content-Type': 'application/json'};
+
+    try {
+      http.Response res = await client.post(
+          Uri.http(rutaBaseAso, "$rutaBaseUrl$url"),
+          headers: headers,
+          body: utf8.encode(jsonEncode(body)));
+
+      if (res.statusCode == 200) {
+        respuesta = Respuesta.fromRawJson(res.body);
+      } else {
+        respuesta =
+            Respuesta(respuesta: "error", mensaje: res.bodyBytes.toString());
+      }
+
+      return respuesta;
+    } catch (e) {
+      return Respuesta(respuesta: "error", mensaje: e.toString());
+    }
+  }
 }
