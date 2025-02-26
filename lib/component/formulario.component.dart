@@ -1,3 +1,4 @@
+import 'package:app_bienestar/component/spiner-asincrono.component.dart';
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/providers/guardar_usuario.dart';
 import 'package:app_bienestar/providers/registro_user.dart';
@@ -197,12 +198,22 @@ class _FormularioComponentState extends State<FormularioComponent> {
       child: AsyncButtonBuilder(
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
-            FocusScope.of(context).unfocus();
             final datUser = RegistroUsuario.fromJson(datoUser.datosUsuario);
-            debugPrint(datUser.toRawJson());
 
-            final res =
-                await UsuarioAsociadoN().guardarAsociado(datUser.toJson());
+            Respuesta res = await showLoadingDialog(
+                context, UsuarioAsociadoN().guardarAsociado(datUser.toJson()));
+
+            if (res.respuesta == "success") {
+              datoUser.limpiarDatos();
+              _dpiController.clear();
+              _telefonoController.clear();
+              _nombreController.clear();
+              _correoController.clear();
+              _direccionController.clear();
+              _contrasenaController.clear();
+              // ignore: use_build_context_synchronously
+              FocusScope.of(context).unfocus();
+            }
 
             // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).showSnackBar(

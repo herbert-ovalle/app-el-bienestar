@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:app_bienestar/class/enviroment.dart';
 import 'package:app_bienestar/models/z_model.dart';
@@ -111,7 +113,7 @@ class PeticionesExternas extends EnvitomentsQuery {
       http.Response res = await client.post(
           Uri.http(rutaBaseAso, "$rutaBaseUrl$url"),
           headers: headers,
-          body: utf8.encode(jsonEncode(body)));
+          body: utf8.encode(jsonEncode(body))).timeout(Duration(seconds: 45));
 
       if (res.statusCode == 200) {
         respuesta = Respuesta.fromRawJson(res.body);
@@ -121,8 +123,22 @@ class PeticionesExternas extends EnvitomentsQuery {
       }
 
       return respuesta;
+    }  on TimeoutException catch (_) {
+
+      return Respuesta(
+        respuesta: "error",
+        mensaje: "⏳ Error: Tiempo de conexión agotado (Timeout)",
+      );
+    } on SocketException catch (_) {
+
+      return Respuesta(
+        respuesta: "error",
+        mensaje: "🌐 Error: No hay conexión a Internet",
+      );
     } catch (e) {
       return Respuesta(respuesta: "error", mensaje: e.toString());
+    } finally {
+      client.close(); 
     }
   }
 }

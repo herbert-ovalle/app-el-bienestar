@@ -1,5 +1,6 @@
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/services/qExterno.service.dart';
+import 'package:app_bienestar/services/servilocal.services.dart';
 import 'package:flutter/material.dart';
 
 class UsuarioAsociadoN extends ChangeNotifier {
@@ -10,8 +11,13 @@ class UsuarioAsociadoN extends ChangeNotifier {
     return res;
   }
 
-  Future<Respuesta> loginAsociado(Map<String, dynamic> datos) async {
-    Respuesta res = await peticion.query(url: "loginAso", body: datos);
+  Future<Respuesta> loginAsociado(LoginModel datos) async {
+    Respuesta res = await peticion.query(url: "loginAso", body: datos.toJson());
+    if(res.respuesta == "success"){
+      await SaveLocal().save("token", res.token ?? "");
+      await SaveLocal().save("user", datos.usuario);
+      await SaveLocal().save("contra", datos.contrasena);
+    }
     return res;
   }
 }

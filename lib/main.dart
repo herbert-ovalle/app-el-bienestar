@@ -4,9 +4,11 @@ import 'package:app_bienestar/themes/tema_app.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screen/screen.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Preferences.init();
   
   runApp(MultiProvider(providers: [
@@ -20,6 +22,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
@@ -29,6 +32,16 @@ class MyApp extends StatelessWidget {
         title: 'Aplicación del Bienestar',
         theme: Provider.of<ThemeProvider>(context).currentTheme,
         debugShowCheckedModeBanner: false,
+        locale: const Locale('es', 'ES'),
+        supportedLocales: const [
+          Locale('es', 'ES'), // Español
+          Locale('en', 'US'), // Inglés (opcional)
+        ],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         home: const HomeScreen(),
         initialRoute: "/home",
         routes: {
