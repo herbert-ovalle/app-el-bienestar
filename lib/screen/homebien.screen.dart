@@ -206,15 +206,15 @@ class TasaCambioP extends StatelessWidget {
               ],
             );
           } else if (snapshot.hasError) {
-            return Center(child: Text("N/D"));
+            return Center(child: Text("Sin conexión",style:TextStyle(color: Colors.black)));
           } else {
             return Center(
                 child: Column(children: <Widget>[
               SizedBox(
-                  width: 16, height: 16, child: CircularProgressIndicator()),
+                  width: 15, height: 15, child: CircularProgressIndicator()),
               Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child: Text('Actualizando tasa cambio...',style: TextStyle(color: Colors.redAccent))),
+                  padding: EdgeInsets.only(top: 8),
+                  child: Text('Actualizar tasa cambio...',style: TextStyle(color: Colors.redAccent))),
             ]));
           }
         });
@@ -568,8 +568,10 @@ class _CurrentDateTimeWidgetState extends State<_CurrentDateTimeWidget> {
             ],
           );
         } else {
-          return Text("Actualizando...",
-              style: TextStyle(fontSize: 18, color: Colors.redAccent));
+          return Center(
+            child: Text("Actualizando...",
+                style: TextStyle(fontSize: 16, color: Colors.redAccent)),
+          );
         }
       },
     );

@@ -49,8 +49,10 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
 
   @override
   void dispose() {
-    _playPauseController.dispose();
-    if (_isPlaying) {
+    if (!_isPlaying) {
+      _playPauseController.dispose();
+      
+    }else{
       _colorChangeTimer.cancel();
     }
     super.dispose();
@@ -71,12 +73,14 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
   }
 
   Future<void> playMusic() async {
-    await ReproductorMusic().playMusic();
-    _startColorChangeAnimation();
-    setState(() {
-      _isPlaying = true;
-    });
-    _playPauseController.forward();
+    final res = await ReproductorMusic().playMusic();
+    if(res == "success"){
+      _startColorChangeAnimation();
+      setState(() {
+        _isPlaying = true;
+      });
+      _playPauseController.forward();
+    }
   }
 
   Future<void> stopMusic() async {
@@ -236,7 +240,7 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
                       const SizedBox(width: 20),
                       IconButton(
                         icon: Icon(Icons.stop, size: 40),
-                        onPressed: stopMusic,
+                        onPressed: _isPlaying  ? stopMusic : null,
                       ),
                     ],
                   ),
@@ -254,7 +258,8 @@ class _MusicPlayerScreen extends State<MusicPlayerScreen>
                         value: _volume,
                         min: 0.0,
                         max: 1.0,
-                        onChanged: changeVolume,
+                        onChanged: _isPlaying ? changeVolume : null,
+                        onChangeEnd: changeVolume,
                         divisions: 10,
                         label: '${(_volume * 100).toInt()}%',
                         activeColor: Colors.white,

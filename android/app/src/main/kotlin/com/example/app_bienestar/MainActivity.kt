@@ -3,24 +3,60 @@ package com.example.app_bienestar
 import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.annotation.NonNull
+import android.content.Context
+import android.media.AudioManager
+import android.util.Log
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import android.widget.Toast
+import android.net.Uri
+
+import androidx.lifecycle.lifecycleScope
+
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-import android.content.Context
-import android.media.AudioManager
-import android.util.Log
-
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.Player
+
 import io.flutter.embedding.android.FlutterFragmentActivity
+
+import com.example.app_bienestar.NetworkReceiver
+import android.content.IntentFilter
+
 
 class MainActivity : FlutterFragmentActivity() {
     private val CHANNEL = "com.example.musicplayer/channel"
     private var mediaPlayer: MediaPlayer? = null
     private var isPlaying = false
+    private lateinit var networkReceiver: NetworkReceiver
+    private lateinit var exoPlayer: ExoPlayer
+    private var isConnected = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        networkReceiver = NetworkReceiver { connected ->
+            runOnUiThread {
+                isConnected = connected
+                if(!isConnected){
+                    stopMusic()
+                }
+                Toast.makeText(this, if (isConnected) "🌍 Internet disponible" else "🌐 Sin conexión", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkReceiver, filter)
+    }
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -29,12 +65,25 @@ class MainActivity : FlutterFragmentActivity() {
             when (call.method) {
                 "playMusic" -> {
 
-                    val url = "https://cloudstream2032.conectarhosting.com/8026/stream"; 
-                    if (url != null) {
-                        playMusic(url)
-                        result.success("Playing")
-                    } else {
-                        result.error("INVALID_URL", "URL is null or invalid", null)
+                    if(isConnected){
+                        val url = "https://cloudstream2032.conectarhosting.com/8026/stream"; 
+                        if (url != null) {
+                            lifecycleScope.launch {
+                                try {
+                                    playMusic(url)
+                                    result.success("success")
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    result.success("error");
+                                }
+                            }
+
+                        } else {
+                            result.success("INVALID_URL")
+                        }
+                    }else{
+                        result.success("NO_INTERNET")
+                        Toast.makeText(this, "🌐 No hay conexión a Internet. Por favor, verifica tu conexión.", Toast.LENGTH_LONG).show()
                     }
                 }
                 "pauseMusic" -> {
@@ -56,6 +105,14 @@ class MainActivity : FlutterFragmentActivity() {
                 "obtenerVolumen" -> {
                     result.success(obtenerVolumen())
                 }
+                "estadoInternet" -> {
+                    if(isConnected){
+                        result.success("online")
+                    }else{
+                        Toast.makeText(this, "🌐 No hay conexión a Internet. Por favor, verifica tu conexión.", Toast.LENGTH_LONG).show()
+                        result.success("offline")
+                    }
+                }
                 else -> result.notImplemented()
             }
         }
@@ -68,10 +125,42 @@ class MainActivity : FlutterFragmentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         exoPlayer.release()
+        unregisterReceiver(networkReceiver)
     }
 
-    private lateinit var exoPlayer: ExoPlayer
-    private fun playMusic(url: String) {
+    private suspend fun playMusic(url: String) {
+
+        exoPlayer = ExoPlayer.Builder(this).build()
+        
+        val mediaItem = MediaItem.fromUri(Uri.parse(url))
+        exoPlayer.setMediaItem(mediaItem)
+        
+        exoPlayer.prepare()
+        
+        suspendCancellableCoroutine<Unit> { continuation ->
+            val listener = object : Player.Listener {
+                override fun onPlaybackStateChanged(state: Int) {
+                    if (state == Player.STATE_READY) {
+                        exoPlayer.removeListener(this)
+                        continuation.resume(Unit)
+                    }
+                }
+            }
+            exoPlayer.addListener(listener)
+            
+            continuation.invokeOnCancellation {
+                exoPlayer.removeListener(listener)
+                exoPlayer.release()
+            }
+        }
+        
+        // Iniciar la reproducción
+        exoPlayer.playWhenReady = true
+        exoPlayer.volume = 0.5f
+        isPlaying = true
+    }
+
+    /*private fun playMusic(url: String) {
 
         exoPlayer = ExoPlayer.Builder(this).build()
         val mediaItem = MediaItem.fromUri(url)
@@ -80,7 +169,7 @@ class MainActivity : FlutterFragmentActivity() {
         exoPlayer.playWhenReady = true
         exoPlayer.volume = 0.5f
         isPlaying = true
-    }
+    }*/
 
     private fun obtenerVolumen(): Double {
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager // Obtener el AudioManager
@@ -118,5 +207,5 @@ class MainActivity : FlutterFragmentActivity() {
         val deviceVolume = (clampedPercentage * maxVolume) / 100
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, deviceVolume, 0)
     }
-
 }
+
