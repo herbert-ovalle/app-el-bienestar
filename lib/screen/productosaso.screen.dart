@@ -1,41 +1,225 @@
+import 'dart:async';
+
+import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/component/menu_perfil.component.dart';
+import 'package:app_bienestar/models/datosUsuario.model.dart';
+import 'package:app_bienestar/models/respuesta.model.dart';
+import 'package:app_bienestar/providers/guardar_usuario.dart';
 import 'package:flutter/material.dart';
 
-class InformacionAsociado extends StatelessWidget {
+class InformacionAsociado extends StatefulWidget {
+  const InformacionAsociado({super.key, required this.usuario});
+  final String usuario;
 
-  const InformacionAsociado({super.key});
+  @override
+  State<InformacionAsociado> createState() => _InformacionAsociadoState();
+}
+
+class _InformacionAsociadoState extends State<InformacionAsociado> {
+  late Future<Respuesta> _futureData;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureData =
+        UsuarioAsociadoN().datosAsociado(); // 🔹 Cargar datos al iniciar
+  }
+
+  @override
+  void dispose() {
+    _futureData.ignore();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<RefreshIndicatorState> refreshIndicatorKey =
+        GlobalKey<RefreshIndicatorState>();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Información del asociado', style: TextStyle(fontSize: 16)),
+        title: const Text('Información del asociado',
+            style: TextStyle(fontSize: 16)),
         actions: [
-            Padding(
+          Padding(
             padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(child: ProfileIcon()),
+            child: CircleAvatar(
+                child: ProfileIcon(
+              items: [
+                PopupMenuItem<Menu>(
+                  value: Menu.itemFour,
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, "/home");
+                  },
+                  child: MenuLista(icono: Icons.exit_to_app, texto: 'Salir'),
+                )
+              ],
+            )),
           )
         ],
       ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Información del asociado', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            Text('Nombre: Juan Pérez'),
-            Text('Cédula: 1234567890'),
-            Text('Teléfono: 000000000000'),
-            Text('Dirección: Calle Principal, Ciudad'),
-            Text('Correo electrónico: juan.perez@example.com'),
-            Text('Fecha de nacimiento: 01/01/1990'),
-            Text('Fecha de ingreso: 01/01/2020'),
-            Text('Fecha de retiro: 01/01/2025'),
-            Text('Estado: Activo'),
-          ],
-        ),
+      body: RefreshIndicator(
+          key: refreshIndicatorKey,
+          color: Colors.white,
+          backgroundColor: Colors.blue,
+          strokeWidth: 4.0,
+          onRefresh: () async {
+            setState(() {
+              _futureData = UsuarioAsociadoN().datosAsociado();
+            });
+            await _futureData;
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Image.asset(
+                  Preferences.isDarkmode
+                      ? "assets/LOGO_BLANCO.png"
+                      : "assets/LOGO_AZUL.png",
+                  width: 1000,
+                  height: 60,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                FutureBuilder(
+                    future: _futureData,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<Respuesta> snapshot) {
+                      List<Widget> children;
+                      if (snapshot.hasData) {
+                        final res = snapshot.data!;
+
+                        if (res.respuesta != "success") {
+                          return Center(
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Icon(
+                                      res.respuesta == "info"
+                                          ? Icons.info
+                                          : Icons.error_outline,
+                                      color: res.respuesta == "info"
+                                          ? Colors.blue
+                                          : Colors.red,
+                                      size: 60),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 15),
+                                    child: Text(res.mensaje,
+                                        style: TextStyle(fontSize: 18)),
+                                  ),
+                                ]),
+                          );
+                        }
+
+                        final datosUser =
+                            RegistroUsuario.fromJson(res.datos![0]);
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _InfoAsociado(
+                                titulo: "Nombre", subtitulo: datosUser.nombres),
+                            _InfoAsociado(
+                                titulo: "CUI",
+                                subtitulo: datosUser.usuario.toString()),
+                            _InfoAsociado(
+                                titulo: "Teléfono",
+                                subtitulo: datosUser.telefono.toString()),
+                            _InfoAsociado(
+                                titulo: "Dirección",
+                                subtitulo: datosUser.direccion.toString()),
+                            SizedBox(height: 20),
+                            Text("Prestamos:",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20)),
+                            SizedBox(height: 50),
+                            Text("Solicitudes:",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20)),
+                            SizedBox(height: 50),
+                            Text("Ahorros:",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20)),
+                            SizedBox(height: 50),
+                            Text("Servicios:",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 20))
+                          ],
+                        );
+                      } else if (snapshot.hasError) {
+                        children = <Widget>[
+                          const Icon(Icons.error_outline,
+                              color: Colors.red, size: 60),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: Text('Error: ${snapshot.error}'),
+                          ),
+                        ];
+                      } else {
+                        children = const <Widget>[
+                          SizedBox(
+                              width: 60,
+                              height: 60,
+                              child: CircularProgressIndicator()),
+                          Padding(
+                              padding: EdgeInsets.only(top: 16),
+                              child: Text('Consultado...')),
+                        ];
+                      }
+                      return Center(
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: children),
+                      );
+                    }),
+              ],
+            ),
+          )),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          setState(() {
+            _futureData = UsuarioAsociadoN().datosAsociado();
+          });
+          await _futureData;
+        },
+        backgroundColor: Colors.blueAccent, // 🎨 Color más llamativo
+        shape: const CircleBorder(),
+        elevation: 10,
+        child: const Icon(Icons.refresh, size: 30, color: Colors.white),
       ),
+    );
+  }
+}
+
+class _InfoAsociado extends StatelessWidget {
+  const _InfoAsociado({
+    required this.titulo,
+    required this.subtitulo,
+  });
+  final String subtitulo;
+  final String titulo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          titulo,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        SizedBox(width: 5),
+        Text(subtitulo,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: TextStyle(fontSize: 15.5)),
+      ],
     );
   }
 }

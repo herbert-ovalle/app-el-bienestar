@@ -103,34 +103,39 @@ class PeticionesExternas extends EnvitomentsQuery {
     return soloFecha1.isBefore(soloFecha2);
   }
 
+  Future<Map<String, String>> headesrss() async {
+    String token = await SaveLocal().get("token");
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
+    };
+  }
+
   Future<Respuesta> query(
-      {required String url, required Map<String, dynamic> body}) async {
+      {required String url, Map<String, dynamic>? body}) async {
     Respuesta respuesta;
     var client = http.Client();
-    final headers = {'Content-Type': 'application/json'};
 
     try {
-      http.Response res = await client.post(
-          Uri.http(rutaBaseAso, "$rutaBaseUrl$url"),
-          headers: headers,
-          body: utf8.encode(jsonEncode(body))).timeout(Duration(seconds: 45));
+      http.Response res = await client
+          .post(Uri.http(rutaBaseAso, "$rutaBaseUrl$url"),
+              headers: await headesrss(),
+              body: utf8.encode(jsonEncode(body ?? {})))
+          .timeout(Duration(seconds: 45));
 
       if (res.statusCode == 200) {
         respuesta = Respuesta.fromRawJson(res.body);
       } else {
-        respuesta =
-            Respuesta(respuesta: "error", mensaje: res.bodyBytes.toString());
+        respuesta = Respuesta(respuesta: "error", mensaje: res.body.toString());
       }
 
       return respuesta;
-    }  on TimeoutException catch (_) {
-
+    } on TimeoutException catch (_) {
       return Respuesta(
         respuesta: "error",
         mensaje: "⏳ Error: Tiempo de conexión agotado (Timeout)",
       );
     } on SocketException catch (_) {
-
       return Respuesta(
         respuesta: "error",
         mensaje: "🌐 Error: No hay conexión a Internet",
@@ -138,7 +143,7 @@ class PeticionesExternas extends EnvitomentsQuery {
     } catch (e) {
       return Respuesta(respuesta: "error", mensaje: e.toString());
     } finally {
-      client.close(); 
+      client.close();
     }
   }
 }

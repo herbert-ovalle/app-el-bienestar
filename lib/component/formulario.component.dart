@@ -99,7 +99,7 @@ class _FormularioComponentState extends State<FormularioComponent> {
                     validar: Validar(maxLength: 9, minLength: 9)),
 
                 InputForm(
-                    name: "nombre",
+                    name: "nombres",
                     controller: _nombreController,
                     label: "Nombre",
                     hint: "Ingrese su nombre completo",
@@ -133,15 +133,7 @@ class _FormularioComponentState extends State<FormularioComponent> {
                     controller: _direccionController,
                     label: "Dirección",
                     hint: "Ingrese su dirección"),
-                // Usuario
-                /*InputForm(
-                  name: "usuario",
-                  controller: _usuarioController,
-                  label: "Usuario",
-                  hint: "Ingrese un usuario",
-                  campoObli: true,
-                  validar: Validar(maxLength: 10, minLength: 5),
-                ),*/
+
                 // Contraseña
                 _buildPasswordField(),
                 // Botón de envío

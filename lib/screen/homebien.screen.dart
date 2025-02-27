@@ -211,9 +211,9 @@ class TasaCambioP extends StatelessWidget {
             return Center(
                 child: Column(children: <Widget>[
               SizedBox(
-                  width: 20, height: 20, child: CircularProgressIndicator()),
+                  width: 16, height: 16, child: CircularProgressIndicator()),
               Padding(
-                  padding: EdgeInsets.only(top: 14),
+                  padding: EdgeInsets.only(top: 10),
                   child: Text('Actualizando tasa cambio...',style: TextStyle(color: Colors.redAccent))),
             ]));
           }

@@ -21,3 +21,12 @@ bool isTokenExpired(String token) {
     return true; // ❌ Si hay un error, el token no es válido
   }
 }
+
+Map<String, dynamic> decodeToken(String token) {
+  try {
+    final jwt = JWT.decode(token);
+    return jwt.payload;
+  } catch (e) {
+    return {};
+  }
+}

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:app_bienestar/services/z_service.dart';
 
 class RegistroUsuario {
-  final String nombre;
+  final String nombres;
   final String? correo;
   final int dpi;
   final int telefono;
@@ -12,7 +12,7 @@ class RegistroUsuario {
   final String contrasena;
 
   RegistroUsuario({
-    required this.nombre,
+    required this.nombres,
     this.correo,
     required this.dpi,
     required this.telefono,
@@ -28,17 +28,17 @@ class RegistroUsuario {
 
   factory RegistroUsuario.fromJson(Map<String, dynamic> json) =>
       RegistroUsuario(
-        nombre: json["nombre"],
+        nombres: json["nombres"],
         correo: json["correo"] ?? "",
         dpi: int.parse(json["dpi"].replaceAll(" ", "")),
-        telefono: int.parse(json["telefono"].replaceAll(" ", "")),
+        telefono: valTelefono(json["telefono"]),
         direccion: json["direccion"] ?? "",
         usuario: json["usuario"] ?? json["dpi"].replaceAll(" ", ""),
-        contrasena: encriptarContrasena(json["contrasena"]),
+        contrasena: encriptarContrasena(json["contrasena"] ?? ""),
       );
 
   Map<String, dynamic> toJson() => {
-        "nombre": nombre,
+        "nombres": nombres,
         "correo": correo,
         "dpi": dpi,
         "telefono": telefono,
@@ -48,11 +48,15 @@ class RegistroUsuario {
       };
 }
 
-
-
+int valTelefono(tel) {
+  if (tel.runtimeType == int) {
+    return tel;
+  } else {
+    return int.parse(tel["telefono"].replaceAll(" ", ""));
+  }
+}
 
 class LoginModel {
-
   final String usuario;
   final String contrasena;
 
@@ -64,17 +68,13 @@ class LoginModel {
   factory LoginModel.fromRawJson(String str) =>
       LoginModel.fromJson(json.decode(str));
 
-  factory LoginModel.fromJson(Map<String, dynamic> json) =>
-      LoginModel(
-
+  factory LoginModel.fromJson(Map<String, dynamic> json) => LoginModel(
         usuario: json["usuario"].replaceAll(" ", ""),
         contrasena: encriptarContrasena(json["contrasena"]),
       );
 
-      Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "usuario": usuario,
         "contrasena": contrasena,
       };
-
-  
 }

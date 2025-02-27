@@ -1,8 +1,10 @@
 import 'package:app_bienestar/class/preferences.theme.dart';
+import 'package:app_bienestar/component/formulario.component.dart';
 import 'package:app_bienestar/component/menu_perfil.component.dart';
 import 'package:app_bienestar/component/radio.component.dart';
 import 'package:app_bienestar/screen/config.screen.dart';
 import 'package:app_bienestar/screen/homebien.screen.dart';
+import 'package:app_bienestar/screen/login.screen.dart';
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
@@ -78,7 +80,31 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(child: ProfileIcon()),
+            child: CircleAvatar(child: ProfileIcon(
+              items: [
+                     PopupMenuItem<Menu>(
+                  value: Menu.itemOne,
+                  child: MenuLista(icono: Icons.login, texto: "Login"),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BankLoginScreen()));
+                  },
+                ),
+                PopupMenuItem<Menu>(
+                  value: Menu.itemTwo,
+                  child: MenuLista(
+                      icono: Icons.person_add, texto: 'Registro de Datos'),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => FormularioComponent()));
+                  },
+                ),
+              ],
+            )),
           )
         ],
       ),

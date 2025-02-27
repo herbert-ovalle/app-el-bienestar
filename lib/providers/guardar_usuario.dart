@@ -6,18 +6,23 @@ import 'package:flutter/material.dart';
 class UsuarioAsociadoN extends ChangeNotifier {
   final peticion = PeticionesExternas();
 
-  Future<Respuesta> guardarAsociado(Map<String,dynamic> datos) async {
+  Future<Respuesta> guardarAsociado(Map<String, dynamic> datos) async {
     Respuesta res = await peticion.query(url: "crearUsuario", body: datos);
     return res;
   }
 
   Future<Respuesta> loginAsociado(LoginModel datos) async {
     Respuesta res = await peticion.query(url: "loginAso", body: datos.toJson());
-    if(res.respuesta == "success"){
+    if (res.respuesta == "success") {
       await SaveLocal().save("token", res.token ?? "");
       await SaveLocal().save("user", datos.usuario);
       await SaveLocal().save("contra", datos.contrasena);
     }
+    return res;
+  }
+
+  Future<Respuesta> datosAsociado() async {
+    Respuesta res = await peticion.query(url: "datoUser");
     return res;
   }
 }

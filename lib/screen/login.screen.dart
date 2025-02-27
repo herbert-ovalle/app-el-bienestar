@@ -62,21 +62,23 @@ class _BankLoginScreenState extends State<BankLoginScreen>
       );
 
       if (authenticated && !isTokenExpired(token)) {
+
+        final datoUser = decodeToken(token);
+        
         Navigator.push(
           // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(
-            builder: (context) => InformacionAsociado(),
+            builder: (context) => InformacionAsociado(usuario: datoUser['usuario']),
           ),
         );
-      }else{
+      } else {
+        await SaveLocal().deleteAll();
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Ingrese su usuario y contraseña")),
         );
-        
       }
-
     } catch (e) {
       setState(() {
         _message = "Error en autenticación: $e";
@@ -243,7 +245,6 @@ class _BankLoginScreenState extends State<BankLoginScreen>
                                   Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      // 🔹 Icono de huella con animación
                                       GestureDetector(
                                         onTap: _authenticate,
                                         child: ScaleTransition(
@@ -256,7 +257,6 @@ class _BankLoginScreenState extends State<BankLoginScreen>
                                         ),
                                       ),
                                       const SizedBox(height: 20),
-
                                       Text(
                                         _message,
                                         style: const TextStyle(
@@ -330,18 +330,27 @@ class _BankLoginScreenState extends State<BankLoginScreen>
         "usuario": _userController.text,
         "contrasena": _passwordController.text
       });
+
       Respuesta res;
       token = await SaveLocal().get("token");
+
       if (token.isNotEmpty && !isTokenExpired(token)) {
         String user = await SaveLocal().get("user");
         String contra = await SaveLocal().get("contra");
+
         if (user == _userController.text &&
             contra == _passwordController.text) {
+          _userController.clear();
+          _passwordController.clear();
           res = Respuesta(respuesta: "success", mensaje: "Login local");
         } else {
-          res = Respuesta(respuesta: "warning", mensaje: "Usuario o contraseña incorrecta, verifique");
+          res = Respuesta(
+              respuesta: "warning",
+              mensaje: "Usuario o contraseña incorrecta, verifique");
+          await SaveLocal().deleteAll();
         }
       } else {
+        await SaveLocal().deleteAll();
         res = await showLoadingDialog(
             // ignore: use_build_context_synchronously
             context,
@@ -349,10 +358,12 @@ class _BankLoginScreenState extends State<BankLoginScreen>
       }
 
       if (res.respuesta == "success") {
+        _userController.clear();
+        _passwordController.clear();
         Navigator.push(
           // ignore: use_build_context_synchronously
           context,
-          MaterialPageRoute(builder: (context) => InformacionAsociado()),
+          MaterialPageRoute(builder: (context) => InformacionAsociado(usuario: datosLogin.usuario)),
         );
       }
 
