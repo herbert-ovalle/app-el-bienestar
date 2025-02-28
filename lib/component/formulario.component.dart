@@ -2,6 +2,7 @@ import 'package:app_bienestar/component/spiner-asincrono.component.dart';
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/providers/guardar_usuario.dart';
 import 'package:app_bienestar/providers/registro_user.dart';
+import 'package:app_bienestar/screen/login.screen.dart';
 import 'package:app_bienestar/themes/tema_app.dart';
 import 'package:async_button_builder/async_button_builder.dart';
 import 'package:flutter/material.dart';
@@ -107,6 +108,9 @@ class _FormularioComponentState extends State<FormularioComponent> {
                     campoObli: true,
                     validar: Validar(maxLength: 60, minLength: 12)),
 
+                // Contraseña
+                _buildPasswordField(),
+
                 InputForm(
                   name: "correo",
                   controller: _correoController,
@@ -134,8 +138,6 @@ class _FormularioComponentState extends State<FormularioComponent> {
                     label: "Dirección",
                     hint: "Ingrese su dirección"),
 
-                // Contraseña
-                _buildPasswordField(),
                 // Botón de envío
                 _buildSubmitButton(context),
               ],
@@ -205,6 +207,13 @@ class _FormularioComponentState extends State<FormularioComponent> {
               _contrasenaController.clear();
               // ignore: use_build_context_synchronously
               FocusScope.of(context).unfocus();
+              Navigator.push(
+                  // ignore: use_build_context_synchronously
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BankLoginScreen(
+                            dpiI: datUser.dpi.toString(),
+                          )));
             }
 
             // ignore: use_build_context_synchronously
@@ -284,11 +293,6 @@ class _InputFormState extends State<InputForm> {
   @override
   void initState() {
     super.initState();
-    /*WidgetsBinding.instance.addPostFrameCallback((_) {
-      final datoUser =
-          Provider.of<DatosUsuarioProvider>(context, listen: false);
-      datoUser.setDato(widget.name, "");
-    });*/
   }
 
   @override
@@ -331,7 +335,33 @@ class _InputFormState extends State<InputForm> {
             FocusScope.of(context).requestFocus(widget.nextFocus);
           }
         },
-        onChanged: (value) {
+        onChanged: (value) async {
+          if (widget.name == "dpi" && value.length == 15) {
+            final rsdpi = await showLoadingDialog(
+                context, UsuarioAsociadoN().validarDPI(value));
+
+            if (rsdpi.respuesta == "success") {
+
+              Navigator.push(
+                  // ignore: use_build_context_synchronously
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BankLoginScreen(
+                            dpiI: value,
+                          )));
+              // ignore: use_build_context_synchronously
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text("Ya tiene usuario ingrese su contraseña")),
+              );
+            }else{
+               // ignore: use_build_context_synchronously
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content: Text(rsdpi.mensaje)),
+              );
+            }
+          }
           datoUser.datosUsuario[widget.name] = value;
         },
       ),

@@ -138,7 +138,7 @@ class PeticionesExternas extends EnvitomentsQuery {
     } on SocketException catch (_) {
       return Respuesta(
         respuesta: "error",
-        mensaje: "🌐 Error: No hay conexión a Internet",
+        mensaje: "🌐 Error: No hay conexión al servidor",
       );
     } catch (e) {
       return Respuesta(respuesta: "error", mensaje: e.toString());

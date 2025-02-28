@@ -1,6 +1,6 @@
 import 'package:app_bienestar/models/z_model.dart';
-import 'package:app_bienestar/services/qExterno.service.dart';
-import 'package:app_bienestar/services/servilocal.services.dart';
+import 'package:app_bienestar/services/z_service.dart';
+
 import 'package:flutter/material.dart';
 
 class UsuarioAsociadoN extends ChangeNotifier {
@@ -23,6 +23,16 @@ class UsuarioAsociadoN extends ChangeNotifier {
 
   Future<Respuesta> datosAsociado() async {
     Respuesta res = await peticion.query(url: "datoUser");
+    return res;
+  }
+
+  Future<Respuesta> validarDPI(String dpi) async {
+    Map<String,dynamic> datosTok = decodeToken(await SaveLocal().get("token"));
+    if (datosTok.containsKey('usuario') && datosTok["usuario"] == dpi.replaceAll(" ", "")) {
+      return Respuesta(respuesta: "success", mensaje: "");
+    }
+
+    Respuesta res = await peticion.query(url: "validaDPI", body: {'dpi': dpi});
     return res;
   }
 }

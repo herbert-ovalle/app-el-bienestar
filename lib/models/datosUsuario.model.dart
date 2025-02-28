@@ -52,7 +52,7 @@ int valTelefono(tel) {
   if (tel.runtimeType == int) {
     return tel;
   } else {
-    return int.parse(tel["telefono"].replaceAll(" ", ""));
+    return int.parse(tel.replaceAll(" ", ""));
   }
 }
 

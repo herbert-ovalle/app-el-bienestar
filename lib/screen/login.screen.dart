@@ -1,16 +1,17 @@
 import 'package:app_bienestar/component/spiner-asincrono.component.dart';
-import 'package:app_bienestar/component/token_verificar.component.dart';
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/providers/guardar_usuario.dart';
 import 'package:app_bienestar/screen/productosaso.screen.dart';
-import 'package:app_bienestar/services/servilocal.services.dart';
+import 'package:app_bienestar/services/z_service.dart';
+
 import 'package:async_button_builder/async_button_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class BankLoginScreen extends StatefulWidget {
-  const BankLoginScreen({super.key});
+  const BankLoginScreen({super.key, this.dpiI});
+  final String? dpiI;
 
   @override
   State<BankLoginScreen> createState() => _BankLoginScreenState();
@@ -37,7 +38,7 @@ class _BankLoginScreenState extends State<BankLoginScreen>
       vsync: this,
       duration: const Duration(seconds: 1),
     )..repeat(reverse: true);
-
+    _userController.text = widget.dpiI ?? "";
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
@@ -62,21 +63,21 @@ class _BankLoginScreenState extends State<BankLoginScreen>
       );
 
       if (authenticated && !isTokenExpired(token)) {
-
         final datoUser = decodeToken(token);
-        
+
         Navigator.push(
           // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(
-            builder: (context) => InformacionAsociado(usuario: datoUser['usuario']),
+            builder: (context) =>
+                InformacionAsociado(usuario: datoUser['usuario']),
           ),
         );
       } else {
         await SaveLocal().deleteAll();
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Ingrese su usuario y contraseña")),
+          SnackBar(content: Text("Ingrese su usuario y contraseña"), duration: Duration(seconds: 2)),
         );
       }
     } catch (e) {
@@ -363,7 +364,9 @@ class _BankLoginScreenState extends State<BankLoginScreen>
         Navigator.push(
           // ignore: use_build_context_synchronously
           context,
-          MaterialPageRoute(builder: (context) => InformacionAsociado(usuario: datosLogin.usuario)),
+          MaterialPageRoute(
+              builder: (context) =>
+                  InformacionAsociado(usuario: datosLogin.usuario)),
         );
       }
 
@@ -371,7 +374,7 @@ class _BankLoginScreenState extends State<BankLoginScreen>
       FocusScope.of(context).unfocus();
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(res.mensaje)),
+        SnackBar(content: Text(res.mensaje), duration: Duration(seconds: 2),),
       );
     }
   }

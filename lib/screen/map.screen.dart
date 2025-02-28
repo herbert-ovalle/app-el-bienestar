@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:app_bienestar/component/mensaje_user.component.dart';
 import 'package:app_bienestar/services/locacion.service.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../models/z_model.dart';
 
 class MapSample extends StatefulWidget {
   const MapSample({super.key});
@@ -16,7 +18,7 @@ class MapSampleState extends State<MapSample> {
       Completer<GoogleMapController>();
 
   final Set<Marker> _markers = {};
-  late Position res;
+  late LatLng res;
   bool _cargando = true;
   MapType _tipoMapa = MapType.terrain;
   final Set<Polyline> _rutas = {};
@@ -39,29 +41,44 @@ class MapSampleState extends State<MapSample> {
   }
 
   Future<void> cargarDatos() async {
-    res = await determinePosition();
-    _markers.add(
-      Marker(
-          markerId: const MarkerId("ubicacion_actual"),
-          position: LatLng(res.latitude, res.longitude),
-          infoWindow: const InfoWindow(title: "Mi Ubicación"),
-          draggable: true,
-          onTap: () {
-            _actualizarZoom(CameraPosition(
-                target: LatLng(res.latitude, res.longitude), zoom: 20.00));
-          }),
-    );
+    Respuesta ress = await determinePosition();
 
-    setState(() {
-      _actualizarZoom(CameraPosition(
-          target: LatLng(res.latitude, res.longitude), zoom: 17.00));
-      _cargando = false;
-    });
-    // Esperar a que el mapa se inicialice y mostrar InfoWindow
-    Future.delayed(const Duration(milliseconds: 500), () async {
-      final controller = await _controller.future;
-      controller.showMarkerInfoWindow(const MarkerId("ubicacion_actual"));
-    });
+    res = LatLng(14.844047316052663, -91.52202836401338);
+
+    if (ress.respuesta == "success") {
+      res = ress.datos![0];
+      _markers.add(
+        Marker(
+            markerId: const MarkerId("ubicacion_actual"),
+            position: LatLng(res.latitude, res.longitude),
+            infoWindow: const InfoWindow(title: "Mi Ubicación"),
+            draggable: true,
+            onTap: () {
+              _actualizarZoom(CameraPosition(
+                  target: LatLng(res.latitude, res.longitude), zoom: 20.00));
+            }),
+      );
+
+      setState(() {
+        _actualizarZoom(CameraPosition(
+            target: LatLng(res.latitude, res.longitude), zoom: 17.00));
+        _cargando = false;
+      });
+
+      // Esperar a que el mapa se inicialice y mostrar InfoWindow
+      Future.delayed(const Duration(milliseconds: 500), () async {
+        final controller = await _controller.future;
+        controller.showMarkerInfoWindow(const MarkerId("ubicacion_actual"));
+      });
+    } else {
+      setState(() {
+        _cargando = false;
+      });
+
+      // ignore: use_build_context_synchronously
+      showBankSnackBar(context, "Información", ress.mensaje);
+
+    }
   }
 
   @override

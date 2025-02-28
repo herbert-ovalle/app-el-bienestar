@@ -28,18 +28,18 @@ class AppTheme {
           TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.bold),
       hintStyle: TextStyle(color: Colors.grey.shade500),
       filled: true,
-      fillColor:  Preferences.isDarkmode ? Colors.grey.shade600 : Colors.white,
+      fillColor:  Preferences.isDarkmode ? Colors.grey.shade700 : Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.blue.shade300, width: 1),
+        borderSide: BorderSide(color: Preferences.isDarkmode ? Colors.white : Colors.blue.shade300, width: 1),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.blue.shade400, width: 1),
+        borderSide: BorderSide(color:Preferences.isDarkmode ? Colors.white : Colors.blue.shade400, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.blue.shade600, width: 1),
+        borderSide: BorderSide(color: Preferences.isDarkmode ? Colors.white : Colors.blue.shade600, width: 1),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),

@@ -1,6 +1,5 @@
 package com.example.app_bienestar
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.annotation.NonNull
 import android.content.Context
@@ -8,49 +7,45 @@ import android.media.AudioManager
 import android.util.Log
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.os.Build
 import android.widget.Toast
 import android.net.Uri
-
-import androidx.lifecycle.lifecycleScope
+import android.content.IntentFilter
 
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.launch
 import kotlin.coroutines.resume
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.Player
-
 import io.flutter.embedding.android.FlutterFragmentActivity
 
 import com.example.app_bienestar.NetworkReceiver
-import android.content.IntentFilter
-
+import com.example.app_bienestar.RadioOnline
 
 class MainActivity : FlutterFragmentActivity() {
     private val CHANNEL = "com.example.musicplayer/channel"
-    private var mediaPlayer: MediaPlayer? = null
-    private var isPlaying = false
     private lateinit var networkReceiver: NetworkReceiver
-    private lateinit var exoPlayer: ExoPlayer
-    private var isConnected = false
+    private var isConnected = true
+    private lateinit var radioPlayer: RadioOnline
+    private val radioUrl = "https://cloudstream2032.conectarhosting.com/8026/stream" // Reemplaza con la URL de tu radio
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        radioPlayer = RadioOnline(this)
+        radioPlayer.initializePlayer(radioUrl)
+
         networkReceiver = NetworkReceiver { connected ->
             runOnUiThread {
                 isConnected = connected
+                Log.d("NetworkReceiver1", "Conexión a Internet: $connected")
                 if(!isConnected){
-                    stopMusic()
+                    radioPlayer.stop()
                 }
-                Toast.makeText(this, if (isConnected) "🌍 Internet disponible" else "🌐 Sin conexión", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, if (connected){ "🌍 Internet disponible"} else {"🌐 Sin conexión"}, Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -66,36 +61,34 @@ class MainActivity : FlutterFragmentActivity() {
                 "playMusic" -> {
 
                     if(isConnected){
-                        val url = "https://cloudstream2032.conectarhosting.com/8026/stream"; 
-                        if (url != null) {
-                            lifecycleScope.launch {
-                                try {
-                                    playMusic(url)
-                                    result.success("success")
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                    result.success("error");
-                                }
+                        radioPlayer.play()
+                        result.success("success")
+                        /*val url = "https://cloudstream2032.conectarhosting.com/8026/stream"; 
+                        lifecycleScope.launch {
+                            try {
+                                playMusic(url)
+                                result.success("success")
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                result.success("error");
                             }
+                        }*/
 
-                        } else {
-                            result.success("INVALID_URL")
-                        }
                     }else{
                         result.success("NO_INTERNET")
                         Toast.makeText(this, "🌐 No hay conexión a Internet. Por favor, verifica tu conexión.", Toast.LENGTH_LONG).show()
                     }
                 }
                 "pauseMusic" -> {
-                    pauseMusic()
+                    radioPlayer.pause()
                     result.success("Paused")
                 }
                 "stopMusic" -> {
-                    stopMusic()
+                    radioPlayer.stop()
                     result.success("Stopped")
                 }
                 "isMusicPlaying" -> {
-                    result.success(isMusicPlaying())
+                    result.success(radioPlayer.isPlaying())
                 }
                 "ajusteVolumen" -> {
                     val ajuste = call.argument<Int>("ajuste")
@@ -103,7 +96,7 @@ class MainActivity : FlutterFragmentActivity() {
                     result.success("Volumen")
                 }
                 "obtenerVolumen" -> {
-                    result.success(obtenerVolumen())
+                    result.success(radioPlayer.getVolume())
                 }
                 "estadoInternet" -> {
                     if(isConnected){
@@ -118,78 +111,11 @@ class MainActivity : FlutterFragmentActivity() {
         }
     }
 
-    private fun isMusicPlaying(): Boolean {
-        return isPlaying
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        exoPlayer.release()
+        radioPlayer.stop()
         unregisterReceiver(networkReceiver)
     }
-
-    private suspend fun playMusic(url: String) {
-
-        exoPlayer = ExoPlayer.Builder(this).build()
-        
-        val mediaItem = MediaItem.fromUri(Uri.parse(url))
-        exoPlayer.setMediaItem(mediaItem)
-        
-        exoPlayer.prepare()
-        
-        suspendCancellableCoroutine<Unit> { continuation ->
-            val listener = object : Player.Listener {
-                override fun onPlaybackStateChanged(state: Int) {
-                    if (state == Player.STATE_READY) {
-                        exoPlayer.removeListener(this)
-                        continuation.resume(Unit)
-                    }
-                }
-            }
-            exoPlayer.addListener(listener)
-            
-            continuation.invokeOnCancellation {
-                exoPlayer.removeListener(listener)
-                exoPlayer.release()
-            }
-        }
-        
-        // Iniciar la reproducción
-        exoPlayer.playWhenReady = true
-        exoPlayer.volume = 0.5f
-        isPlaying = true
-    }
-
-    /*private fun playMusic(url: String) {
-
-        exoPlayer = ExoPlayer.Builder(this).build()
-        val mediaItem = MediaItem.fromUri(url)
-        exoPlayer.setMediaItem(mediaItem)
-        exoPlayer.prepare() // Preparación asíncrona
-        exoPlayer.playWhenReady = true
-        exoPlayer.volume = 0.5f
-        isPlaying = true
-    }*/
-
-    private fun obtenerVolumen(): Double {
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager // Obtener el AudioManager
-        val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) // Volumen actual del stream de música
-        val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) // Volumen máximo del stream de música
-        val percentage = (currentVolume.toFloat() / maxVolume.toFloat()).toDouble() // Calcular el porcentaje
-        return percentage // Devolver el porcentaje
-    }
-
-    private fun pauseMusic() {
-        exoPlayer?.pause()
-        isPlaying = false
-    }
-
-    private fun stopMusic() {
-        exoPlayer?.stop()
-        exoPlayer?.release()
-        isPlaying = false
-    }
-
 
     private fun adjustVolume(percentage: Int?) {
         // Asegura que el porcentaje esté entre 0 y 100
@@ -198,8 +124,9 @@ class MainActivity : FlutterFragmentActivity() {
         // Convierte el porcentaje a un valor entre 0 y 1
         val newVolume = clampedPercentage / 100f
 
+        radioPlayer.setVolume(newVolume)
         // Asigna el nuevo volumen al ExoPlayer
-        exoPlayer.volume = newVolume
+        //exoPlayer.volume = newVolume
 
         // Ajusta el volumen general del dispositivo
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
