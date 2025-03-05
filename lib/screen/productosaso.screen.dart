@@ -5,6 +5,7 @@ import 'package:app_bienestar/component/menu_perfil.component.dart';
 import 'package:app_bienestar/models/datosUsuario.model.dart';
 import 'package:app_bienestar/models/respuesta.model.dart';
 import 'package:app_bienestar/providers/guardar_usuario.dart';
+import 'package:app_bienestar/services/z_service.dart';
 import 'package:flutter/material.dart';
 
 class InformacionAsociado extends StatefulWidget {
@@ -21,13 +22,14 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
   @override
   void initState() {
     super.initState();
-    _futureData =
-        UsuarioAsociadoN().datosAsociado(); // 🔹 Cargar datos al iniciar
+    _futureData = UsuarioAsociadoN().datosAsociado(); // 🔹 Cargar datos al iniciar
+    InactivityService.startTracking(context);
   }
 
   @override
   void dispose() {
     _futureData.ignore();
+    InactivityService.stopTracking();
     super.dispose();
   }
 
@@ -36,162 +38,165 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
     final GlobalKey<RefreshIndicatorState> refreshIndicatorKey =
         GlobalKey<RefreshIndicatorState>();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Información del asociado',
-            style: TextStyle(fontSize: 16)),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-                child: ProfileIcon(
-              items: [
-                PopupMenuItem<Menu>(
-                  value: Menu.itemFour,
-                  onTap: () {
-                    Navigator.pushReplacementNamed(context, "/home");
-                  },
-                  child: MenuLista(icono: Icons.exit_to_app, texto: 'Salir'),
-                )
-              ],
+    return GestureDetector(
+      onTap: () => InactivityService.resetTimer(context), 
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Información del asociado',
+              style: TextStyle(fontSize: 16)),
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 16.0),
+              child: CircleAvatar(
+                  child: ProfileIcon(
+                items: [
+                  PopupMenuItem<Menu>(
+                    value: Menu.itemFour,
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, "/home");
+                    },
+                    child: MenuLista(icono: Icons.exit_to_app, texto: 'Salir'),
+                  )
+                ],
+              )),
+            )
+          ],
+        ),
+        body: RefreshIndicator(
+            key: refreshIndicatorKey,
+            color: Colors.white,
+            backgroundColor: Colors.blue,
+            strokeWidth: 2.0,
+            onRefresh: () async {
+              setState(() {
+                _futureData = UsuarioAsociadoN().datosAsociado();
+              });
+              await _futureData;
+            },
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Image.asset(
+                    Preferences.isDarkmode
+                        ? "assets/LOGO_BLANCO.png"
+                        : "assets/LOGO_AZUL.png",
+                    width: 1000,
+                    height: 60,
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  FutureBuilder(
+                      future: _futureData,
+                      builder: (BuildContext context,
+                          AsyncSnapshot<Respuesta> snapshot) {
+                        List<Widget> children;
+                        if (snapshot.hasData) {
+                          final res = snapshot.data!;
+      
+                          if (res.respuesta != "success") {
+                            return Center(
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Icon(
+                                        res.respuesta == "info"
+                                            ? Icons.info
+                                            : Icons.error_outline,
+                                        color: res.respuesta == "info"
+                                            ? Colors.blue
+                                            : Colors.red,
+                                        size: 60),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 15),
+                                      child: Text(res.mensaje,
+                                          style: TextStyle(fontSize: 18)),
+                                    ),
+                                  ]),
+                            );
+                          }
+      
+                          final datosUser =
+                              RegistroUsuario.fromJson(res.datos![0]);
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _InfoAsociado(
+                                  titulo: "Nombre", subtitulo: datosUser.nombres),
+                              _InfoAsociado(
+                                  titulo: "CUI",
+                                  subtitulo: datosUser.usuario.toString()),
+                              _InfoAsociado(
+                                  titulo: "Teléfono",
+                                  subtitulo: datosUser.telefono.toString()),
+                              _InfoAsociado(
+                                  titulo: "Dirección",
+                                  subtitulo: datosUser.direccion.toString()),
+                              SizedBox(height: 20),
+                              Text("Prestamos:",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 20)),
+                              SizedBox(height: 50),
+                              Text("Solicitudes:",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 20)),
+                              SizedBox(height: 50),
+                              Text("Ahorros:",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 20)),
+                              SizedBox(height: 50),
+                              Text("Servicios:",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 20))
+                            ],
+                          );
+                        } else if (snapshot.hasError) {
+                          children = <Widget>[
+                            const Icon(Icons.error_outline,
+                                color: Colors.red, size: 60),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: Text('Error: ${snapshot.error}'),
+                            ),
+                          ];
+                        } else {
+                          children = const <Widget>[
+                            SizedBox(
+                                width: 60,
+                                height: 60,
+                                child: CircularProgressIndicator()),
+                            Padding(
+                                padding: EdgeInsets.only(top: 16),
+                                child: Text('Consultado...')),
+                          ];
+                        }
+                        return Center(
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: children),
+                        );
+                      }),
+                ],
+              ),
             )),
-          )
-        ],
-      ),
-      body: RefreshIndicator(
-          key: refreshIndicatorKey,
-          color: Colors.white,
-          backgroundColor: Colors.blue,
-          strokeWidth: 4.0,
-          onRefresh: () async {
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
             setState(() {
               _futureData = UsuarioAsociadoN().datosAsociado();
             });
             await _futureData;
           },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Image.asset(
-                  Preferences.isDarkmode
-                      ? "assets/LOGO_BLANCO.png"
-                      : "assets/LOGO_AZUL.png",
-                  width: 1000,
-                  height: 60,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                FutureBuilder(
-                    future: _futureData,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<Respuesta> snapshot) {
-                      List<Widget> children;
-                      if (snapshot.hasData) {
-                        final res = snapshot.data!;
-
-                        if (res.respuesta != "success") {
-                          return Center(
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Icon(
-                                      res.respuesta == "info"
-                                          ? Icons.info
-                                          : Icons.error_outline,
-                                      color: res.respuesta == "info"
-                                          ? Colors.blue
-                                          : Colors.red,
-                                      size: 60),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 15),
-                                    child: Text(res.mensaje,
-                                        style: TextStyle(fontSize: 18)),
-                                  ),
-                                ]),
-                          );
-                        }
-
-                        final datosUser =
-                            RegistroUsuario.fromJson(res.datos![0]);
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _InfoAsociado(
-                                titulo: "Nombre", subtitulo: datosUser.nombres),
-                            _InfoAsociado(
-                                titulo: "CUI",
-                                subtitulo: datosUser.usuario.toString()),
-                            _InfoAsociado(
-                                titulo: "Teléfono",
-                                subtitulo: datosUser.telefono.toString()),
-                            _InfoAsociado(
-                                titulo: "Dirección",
-                                subtitulo: datosUser.direccion.toString()),
-                            SizedBox(height: 20),
-                            Text("Prestamos:",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20)),
-                            SizedBox(height: 50),
-                            Text("Solicitudes:",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20)),
-                            SizedBox(height: 50),
-                            Text("Ahorros:",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20)),
-                            SizedBox(height: 50),
-                            Text("Servicios:",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 20))
-                          ],
-                        );
-                      } else if (snapshot.hasError) {
-                        children = <Widget>[
-                          const Icon(Icons.error_outline,
-                              color: Colors.red, size: 60),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 16),
-                            child: Text('Error: ${snapshot.error}'),
-                          ),
-                        ];
-                      } else {
-                        children = const <Widget>[
-                          SizedBox(
-                              width: 60,
-                              height: 60,
-                              child: CircularProgressIndicator()),
-                          Padding(
-                              padding: EdgeInsets.only(top: 16),
-                              child: Text('Consultado...')),
-                        ];
-                      }
-                      return Center(
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: children),
-                      );
-                    }),
-              ],
-            ),
-          )),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          setState(() {
-            _futureData = UsuarioAsociadoN().datosAsociado();
-          });
-          await _futureData;
-        },
-        backgroundColor: Colors.blueAccent, // 🎨 Color más llamativo
-        shape: const CircleBorder(),
-        elevation: 10,
-        child: const Icon(Icons.refresh, size: 30, color: Colors.white),
+          backgroundColor: Colors.blueAccent, // 🎨 Color más llamativo
+          shape: const CircleBorder(),
+          elevation: 10,
+          child: const Icon(Icons.refresh, size: 30, color: Colors.white),
+        ),
       ),
     );
   }

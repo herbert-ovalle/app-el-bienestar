@@ -107,7 +107,9 @@ class PeticionesExternas extends EnvitomentsQuery {
     String token = await SaveLocal().get("token");
     return {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token'
+      'Authorization': 'Bearer $token',
+      'KeyUnique':'b868632d51e071869c5e1686f9cef65e471b1f0e5cb0e859f7c885edc1f6a6641',
+      'AccessApp':'movilAsoBien'
     };
   }
 

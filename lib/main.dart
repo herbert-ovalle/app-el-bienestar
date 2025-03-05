@@ -1,6 +1,5 @@
 import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/providers/registro_user.dart';
-import 'package:app_bienestar/services/z_service.dart';
 import 'package:app_bienestar/themes/tema_app.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,8 +10,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Preferences.init();
-  ReproductorMusic().obtenerInternet().then((_) {});
-  
+
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(
         create: (_) => ThemeProvider(isDarkmode: Preferences.isDarkmode))
