@@ -5,6 +5,7 @@ import 'package:app_bienestar/component/radio.component.dart';
 import 'package:app_bienestar/screen/config.screen.dart';
 import 'package:app_bienestar/screen/homebien.screen.dart';
 import 'package:app_bienestar/screen/login.screen.dart';
+import 'package:app_bienestar/services/qExterno.service.dart';
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
@@ -22,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    PeticionesExternas().catalogoIncial().then((_) => {});
     _updateNavBarItems(); // Llamar función para inicializar
   }
 
@@ -39,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _updateNavBarItems();
     });
-
   }
 
   void _updateNavBarItems() {
@@ -60,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
         icon: const Icon(Icons.account_balance),
         title: const Text("Productos", style: TextStyle(fontSize: 20)),
         selectedColor: Colors.orange,
-      ),*/ 
+      ),*/
       SalomonBottomBarItem(
         icon: const Icon(Icons.settings),
         title: const Text("Ajustes", style: TextStyle(fontSize: 20)),
@@ -80,9 +81,10 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(child: ProfileIcon(
+            child: CircleAvatar(
+                child: ProfileIcon(
               items: [
-                     PopupMenuItem<Menu>(
+                PopupMenuItem<Menu>(
                   value: Menu.itemOne,
                   child: MenuLista(icono: Icons.login, texto: "Login"),
                   onTap: () {

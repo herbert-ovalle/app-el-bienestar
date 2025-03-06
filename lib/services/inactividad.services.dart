@@ -21,7 +21,6 @@ class InactivityService {
 
   static Future<void> resetTimer(BuildContext context) async {
     stopTracking();
-    print(timeoutDuration);
     _inactivityTimer = Timer(timeoutDuration, () => _logout(context));
   }
 

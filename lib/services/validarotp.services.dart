@@ -7,7 +7,7 @@ String errorPeticion = "";
 void mostrarDialogoOTP(BuildContext context, {required String usuario, String mensaje = "Ingrese el código de acceso enviado a su teléfono"}) {
   TextEditingController otpController = TextEditingController();
   bool isLoading = false;
-
+  errorPeticion = "";
   showDialog(
     context: context,
     barrierDismissible: false,
@@ -56,6 +56,8 @@ void mostrarDialogoOTP(BuildContext context, {required String usuario, String me
                     Text(
                       textAlign: TextAlign.center,
                       errorPeticion,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                     SizedBox(height: 10),

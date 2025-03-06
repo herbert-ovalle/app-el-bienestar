@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:intl/intl.dart';
 
-String encriptarContrasena(String valor){
+String encriptarContrasena(String valor) {
   var key = utf8.encode('p@ssw0rd_anhs');
   var bytes = utf8.encode(valor);
 
@@ -35,5 +36,15 @@ Map<String, dynamic> decodeToken(String token) {
     return jwt.payload;
   } catch (e) {
     return {};
+  }
+}
+
+String formatoMoneda(double cantidad) {
+
+  try {
+    final formato = NumberFormat.currency(symbol: 'Q ');
+    return formato.format(cantidad);
+  } catch (e) {
+    return "0.00";
   }
 }

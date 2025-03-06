@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import 'package:app_bienestar/class/preferences.theme.dart';
-import 'package:app_bienestar/component/movertexto.component.dart';
 import 'package:app_bienestar/component/z_component.dart';
+import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/screen/login.screen.dart';
 import 'package:app_bienestar/screen/map.screen.dart';
-import 'package:app_bienestar/services/qExterno.service.dart';
+import 'package:app_bienestar/services/z_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -123,7 +125,8 @@ class HomeBienestar extends StatelessWidget {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(left: 20),
-                      child: Text("Aplicaciones", style: TextStyle(fontSize:  14)),
+                      child:
+                          Text("Aplicaciones", style: TextStyle(fontSize: 14)),
                     ),
                   ],
                 ),
@@ -206,7 +209,9 @@ class TasaCambioP extends StatelessWidget {
               ],
             );
           } else if (snapshot.hasError) {
-            return Center(child: Text("Sin conexión",style:TextStyle(color: Colors.black)));
+            return Center(
+                child: Text("Sin conexión",
+                    style: TextStyle(color: Colors.black)));
           } else {
             return Center(
                 child: Column(children: <Widget>[
@@ -214,7 +219,8 @@ class TasaCambioP extends StatelessWidget {
                   width: 15, height: 15, child: CircularProgressIndicator()),
               Padding(
                   padding: EdgeInsets.only(top: 8),
-                  child: Text('Actualizar tasa cambio...',style: TextStyle(color: Colors.redAccent))),
+                  child: Text('Actualizar tasa cambio...',
+                      style: TextStyle(color: Colors.redAccent))),
             ]));
           }
         });
@@ -449,13 +455,25 @@ class _IconosProducto extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 5, left: 5),
       child: GestureDetector(
-        onTap: () {
+        onTap: () async {
+          List<dynamic> catalogo =
+              jsonDecode(await SaveLocal().get("catalogoLocal"));
+
+          List<ProductosCatalogo> datosPro = [];
+          if (catalogo.isNotEmpty) {
+            datosPro = catalogo
+                .where((x) => x['idProducto'] == (index + 1))
+                .map((e) => ProductosCatalogo.fromJson(e))
+                .toList();
+          }
           Navigator.push(
+            // ignore: use_build_context_synchronously
             context,
             MaterialPageRoute(
                 builder: (context) => ProductosScreen(
                       tituloAppBar: titulo,
                       tipo: index,
+                      prodCat: datosPro,
                     )),
           );
         },

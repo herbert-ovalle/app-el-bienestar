@@ -12,6 +12,7 @@ import 'package:xml2json/xml2json.dart';
 
 class PeticionesExternas extends EnvitomentsQuery {
   final serviLocal = SaveLocal();
+
   Future<String> postTasaCambio() async {
     String tasaCam = await serviLocal.get("tasaC");
     if (tasaCam.isNotEmpty) {
@@ -105,25 +106,38 @@ class PeticionesExternas extends EnvitomentsQuery {
 
   Future<Map<String, String>> headesrss() async {
     String token = await SaveLocal().get("token");
+
     return {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
-      'KeyUnique':'b868632d51e071869c5e1686f9cef65e471b1f0e5cb0e859f7c885edc1f6a6641',
-      'AccessApp':'movilAsoBien'
+      'KeyUnique':
+          'b868632d51e071869c5e1686f9cef65e471b1f0e5cb0e859f7c885edc1f6a6641',
+      'AccessApp': 'movilAsoBien'
     };
   }
 
+  int tiempoRespuesta = 45;
   Future<Respuesta> query(
-      {required String url, Map<String, dynamic>? body}) async {
+      {required String url,
+      Map<String, dynamic>? body,
+      String tipoPet = "post"}) async {
     Respuesta respuesta;
     var client = http.Client();
 
     try {
-      http.Response res = await client
-          .post(Uri.http(rutaBaseAso, "$rutaBaseUrl$url"),
-              headers: await headesrss(),
-              body: utf8.encode(jsonEncode(body ?? {})))
-          .timeout(Duration(seconds: 45));
+      http.Response res;
+      if (tipoPet == "post") {
+        res = await client
+            .post(Uri.http(rutaBaseAso, "$rutaBaseUrl$url"),
+                headers: await headesrss(),
+                body: utf8.encode(jsonEncode(body ?? {})))
+            .timeout(Duration(seconds: tiempoRespuesta));
+      } else {
+        res = await client
+            .get(Uri.http(rutaBaseAso, "$rutaBaseUrl$url"),
+                headers: await headesrss())
+            .timeout(Duration(seconds: tiempoRespuesta));
+      }
 
       if (res.statusCode == 200) {
         respuesta = Respuesta.fromRawJson(res.body);
@@ -147,5 +161,12 @@ class PeticionesExternas extends EnvitomentsQuery {
     } finally {
       client.close();
     }
+  }
+
+  Future<Respuesta> catalogoIncial() async {
+    Respuesta res = await query(url: "catProductos",tipoPet: "get");
+    await serviLocal.save("catalogoLocal", jsonEncode(res.datos));
+
+    return res;
   }
 }
