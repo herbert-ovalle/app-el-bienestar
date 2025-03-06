@@ -7,9 +7,15 @@ import android.media.AudioManager
 import android.util.Log
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.widget.Toast
 import android.net.Uri
 import android.content.IntentFilter
+
+import android.widget.Toast
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.view.Gravity
+import android.view.View
+import android.widget.TextView
 
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
@@ -29,8 +35,6 @@ class MainActivity : FlutterFragmentActivity() {
     private var isConnected = true
     private lateinit var radioPlayer: RadioOnline
     private val radioUrl = "https://cloudstream2032.conectarhosting.com/8026/stream" // Reemplaza con la URL de tu radio
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,6 +109,10 @@ class MainActivity : FlutterFragmentActivity() {
                         Toast.makeText(this, "🌐 No hay conexión a Internet. Por favor, verifica tu conexión.", Toast.LENGTH_LONG).show()
                         result.success("offline")
                     }
+                } "showSnackBar" -> {
+                    val message = call.argument<String>("message") ?: "Mensaje vacío"
+                    showBankSnackBar(message)
+                    result.success("mensajes")
                 }
                 else -> result.notImplemented()
             }
@@ -125,14 +133,29 @@ class MainActivity : FlutterFragmentActivity() {
         val newVolume = clampedPercentage / 100f
 
         radioPlayer.setVolume(newVolume)
-        // Asigna el nuevo volumen al ExoPlayer
-        //exoPlayer.volume = newVolume
 
-        // Ajusta el volumen general del dispositivo
         val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
         val deviceVolume = (clampedPercentage * maxVolume) / 100
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, deviceVolume, 0)
+    }
+
+    private fun showBankSnackBar(mensaje: String) {
+
+        val toast = Toast.makeText(this, mensaje, Toast.LENGTH_LONG)
+
+        // Obtener el View del Toast
+        val view = toast.view
+        view?.setBackgroundColor(Color.DKGRAY) // Fondo oscuro
+
+        // Obtener el TextView dentro del Toast y cambiar color de texto
+        val text = view?.findViewById<TextView>(android.R.id.message)
+        text?.setTextColor(Color.WHITE)
+        text?.textSize = 16f
+
+        toast.setGravity(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 200)
+        toast.show()
+        //Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 }
 

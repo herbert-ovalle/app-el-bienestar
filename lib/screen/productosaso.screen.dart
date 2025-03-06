@@ -22,7 +22,8 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
   @override
   void initState() {
     super.initState();
-    _futureData = UsuarioAsociadoN().datosAsociado(); // 🔹 Cargar datos al iniciar
+    _futureData =
+        UsuarioAsociadoN().datosAsociado(); // 🔹 Cargar datos al iniciar
     InactivityService.startTracking(context);
   }
 
@@ -39,7 +40,7 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
         GlobalKey<RefreshIndicatorState>();
 
     return GestureDetector(
-      onTap: () => InactivityService.resetTimer(context), 
+      onTap: () => InactivityService.resetTimer(context),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Información del asociado',
@@ -69,6 +70,7 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
             strokeWidth: 2.0,
             onRefresh: () async {
               setState(() {
+                InactivityService.resetTimer(context);
                 _futureData = UsuarioAsociadoN().datosAsociado();
               });
               await _futureData;
@@ -96,8 +98,12 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
                         List<Widget> children;
                         if (snapshot.hasData) {
                           final res = snapshot.data!;
-      
+
                           if (res.respuesta != "success") {
+                            if (res.eliSess == 1) {
+                              SaveLocal().deleteAll().then((_) => {});
+                            }
+
                             return Center(
                               child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -120,40 +126,52 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
                                   ]),
                             );
                           }
-      
+
                           final datosUser =
                               RegistroUsuario.fromJson(res.datos![0]);
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _InfoAsociado(
-                                  titulo: "Nombre", subtitulo: datosUser.nombres),
-                              _InfoAsociado(
-                                  titulo: "CUI",
-                                  subtitulo: datosUser.usuario.toString()),
-                              _InfoAsociado(
-                                  titulo: "Teléfono",
-                                  subtitulo: datosUser.telefono.toString()),
-                              _InfoAsociado(
-                                  titulo: "Dirección",
-                                  subtitulo: datosUser.direccion.toString()),
-                              SizedBox(height: 20),
-                              Text("Prestamos:",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 20)),
-                              SizedBox(height: 50),
-                              Text("Solicitudes:",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 20)),
-                              SizedBox(height: 50),
-                              Text("Ahorros:",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 20)),
-                              SizedBox(height: 50),
-                              Text("Servicios:",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 20))
-                            ],
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _InfoAsociado(
+                                    titulo: "Nombre",
+                                    subtitulo: datosUser.nombres),
+                                _InfoAsociado(
+                                    titulo: "CUI",
+                                    subtitulo: datosUser.usuario.toString()),
+                                _InfoAsociado(
+                                    titulo: "Teléfono",
+                                    subtitulo: datosUser.telefono.toString()),
+                                _InfoAsociado(
+                                    titulo: "Dirección",
+                                    subtitulo: datosUser.direccion.toString()),
+                                SizedBox(height: 20),
+                                Text("Prestamos:",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20)),
+                                ...res.datos!.map((e) => Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 10),
+                                      child: Text(e.toString()),
+                                    )),
+                                Text("Solicitudes:",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20)),
+                                SizedBox(height: 50),
+                                Text("Ahorros:",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20)),
+                                SizedBox(height: 50),
+                                Text("Servicios:",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20))
+                              ],
+                            ),
                           );
                         } else if (snapshot.hasError) {
                           children = <Widget>[
@@ -188,6 +206,7 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             setState(() {
+              InactivityService.resetTimer(context);
               _futureData = UsuarioAsociadoN().datosAsociado();
             });
             await _futureData;

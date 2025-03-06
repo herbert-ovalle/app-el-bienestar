@@ -30,4 +30,8 @@ class ReproductorMusic {
   Future<void> obtenerInternet() async {
     await platform.invokeMethod('estadoInternet');
   }
+
+  Future<void> showBankSnackBar(String message) async {
+    await platform.invokeMethod('showSnackBar', {"message": message});
+  }
 }

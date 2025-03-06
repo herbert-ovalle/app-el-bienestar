@@ -5,11 +5,10 @@ import 'package:flutter/material.dart';
 
 class InactivityService {
   static Timer? _inactivityTimer;
-  static const Duration timeoutDuration = Duration(seconds: 45);
+  static const Duration timeoutDuration = Duration(seconds: 58);
 
   ///inicio de la verificacion
   static void startTracking(BuildContext context) {
-    
     resetTimer(context);
 
     WidgetsBinding.instance.addObserver(
@@ -22,6 +21,7 @@ class InactivityService {
 
   static Future<void> resetTimer(BuildContext context) async {
     stopTracking();
+    print(timeoutDuration);
     _inactivityTimer = Timer(timeoutDuration, () => _logout(context));
   }
 

@@ -7,15 +7,18 @@ class Respuesta {
   final List<dynamic>? datos;
   final String detalleError;
   final String? token;
+  final int? eliSess;
+  final int? idSession;
 
-  Respuesta(
-  {
+  Respuesta({
     required this.respuesta,
     required this.mensaje,
     this.titulo = '',
     this.datos,
     this.detalleError = '',
-    this.token = '', 
+    this.token = '',
+    this.eliSess = 0,
+    this.idSession = 0,
   });
 
   factory Respuesta.fromRawJson(String str) =>
@@ -27,9 +30,13 @@ class Respuesta {
         respuesta: json["respuesta"],
         mensaje: json["mensaje"],
         titulo: json["titulo"] ?? "",
-        datos:  json["datos"] == null ? [] : List<dynamic>.from(json["datos"].map((x) => x)),
+        datos: json["datos"] == null
+            ? []
+            : List<dynamic>.from(json["datos"].map((x) => x)),
         detalleError: json["detalleError"] ?? "",
         token: json["token"] ?? "",
+        eliSess: json["eliSess"] ?? 0,
+        idSession: json["idSession"] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
@@ -38,6 +45,8 @@ class Respuesta {
         "titulo": titulo,
         "datos": datos == null ? [] : List<dynamic>.from(datos!.map((x) => x)),
         "detalleError": detalleError,
-        "token": token
+        "token": token,
+        "eliSess": eliSess,
+        "idSession":idSession
       };
 }

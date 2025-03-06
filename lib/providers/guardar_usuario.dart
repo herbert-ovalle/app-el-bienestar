@@ -17,6 +17,7 @@ class UsuarioAsociadoN extends ChangeNotifier {
       await SaveLocal().save("token", res.token ?? "");
       await SaveLocal().save("user", datos.usuario);
       await SaveLocal().save("contra", datos.contrasena);
+      await SaveLocal().save("idSession", res.idSession.toString());
     }
     return res;
   }

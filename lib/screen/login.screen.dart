@@ -1,7 +1,7 @@
 import 'package:app_bienestar/component/spiner-asincrono.component.dart';
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/providers/guardar_usuario.dart';
-import 'package:app_bienestar/screen/productosaso.screen.dart';
+import 'package:app_bienestar/services/validarotp.services.dart';
 import 'package:app_bienestar/services/z_service.dart';
 
 import 'package:async_button_builder/async_button_builder.dart';
@@ -64,25 +64,22 @@ class _BankLoginScreenState extends State<BankLoginScreen>
 
       if (authenticated && !isTokenExpired(token)) {
         final datoUser = decodeToken(token);
-
-        Navigator.push(
-          // ignore: use_build_context_synchronously
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                InformacionAsociado(usuario: datoUser['usuario']),
-          ),
-        );
+        // ignore: use_build_context_synchronously
+        mostrarDialogoOTP(context,
+            usuario: datoUser['usuario'],
+            mensaje: "Ingrese el código de acceso enviado anteriormente a su teléfono");
       } else {
         await SaveLocal().deleteAll();
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Ingrese su usuario y contraseña"), duration: Duration(seconds: 2)),
+          SnackBar(
+              content: Text("Ingrese su usuario y contraseña"),
+              duration: Duration(seconds: 2)),
         );
       }
     } catch (e) {
       setState(() {
-        _message = "Error en autenticación: $e";
+        _message = "❌ Error en autenticación";
       });
       return;
     }
@@ -321,6 +318,7 @@ class _BankLoginScreenState extends State<BankLoginScreen>
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide.none,
       ),
+      errorStyle: TextStyle(color: Colors.red[400], fontSize: 16)
     );
   }
 
@@ -359,22 +357,21 @@ class _BankLoginScreenState extends State<BankLoginScreen>
       }
 
       if (res.respuesta == "success") {
+        // ignore: use_build_context_synchronously
+        mostrarDialogoOTP(context,
+            usuario: datosLogin.usuario);
         _userController.clear();
         _passwordController.clear();
-        Navigator.push(
-          // ignore: use_build_context_synchronously
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  InformacionAsociado(usuario: datosLogin.usuario)),
-        );
       }
 
       // ignore: use_build_context_synchronously
       FocusScope.of(context).unfocus();
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(res.mensaje), duration: Duration(seconds: 2),),
+        SnackBar(
+          content: Text(res.mensaje),
+          duration: Duration(seconds: 2),
+        ),
       );
     }
   }
