@@ -164,8 +164,8 @@ class PeticionesExternas extends EnvitomentsQuery {
   }
 
   Future<Respuesta> catalogoIncial() async {
-    Respuesta res = await query(url: "catProductos",tipoPet: "get");
-    await serviLocal.save("catalogoLocal", jsonEncode(res.datos));
+    Respuesta res = await query(url: "catProductos", tipoPet: "get");
+    await serviLocal.save("catalogoLocal", jsonEncode(res.datos ?? []));
 
     return res;
   }

@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:math';
-
 import 'package:app_bienestar/class/preferences.theme.dart';
+import 'package:app_bienestar/component/fomulariosolicitud.component.dart';
+import 'package:app_bienestar/component/inforequisitos.component.dart';
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:flutter/material.dart';
 
@@ -37,13 +37,19 @@ class ProductosScreen extends StatelessWidget {
                     : "assets/LOGO_AZUL.png"),
                 height: 50,
               ),
-              if ([0, 1, 2].contains(tipo))
+              if (prodCat.isNotEmpty)
                 TextButton(
                   style: ButtonStyle(
                     backgroundColor:
                         WidgetStateProperty.all<Color>(Colors.blue),
                   ),
-                  onPressed: () {},
+                  onPressed: () => showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      useSafeArea: false,
+                      builder: (BuildContext context) {
+                        return FormularioSolicitud(titulo: tituloAppBar,lstCatalogo: prodCat,);
+                      }),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
@@ -313,10 +319,12 @@ class InformacionProducto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> valores = jsonDecode(lstRequisitos);
-    List<dynamic> listValores = valores.values.toList()[0];
+    List<dynamic> listValores = [];
+    if (lstRequisitos != null) {
+      Map<String, dynamic> valores = jsonDecode(lstRequisitos);
+      listValores = valores.values.toList()[0];
+    }
 
-   
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -332,11 +340,28 @@ class InformacionProducto extends StatelessWidget {
           textAlign: TextAlign.justify,
           style: TextStyle(fontSize: 16),
         ),
+        if (listValores.isNotEmpty)
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                mostrarRequisitos(context, listValores, titulo);
+              },
+              icon: Icon(Icons.info, color: Colors.white),
+              label: Text("Requisitos", style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[600], // Color del botón
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                textStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10), // Bordes redondeados
+                ),
+              ),
+            ),
+          ),
         Image(
           image: AssetImage(imagen),
         ),
-        SizedBox(height: 10),
-        ...listValores.map((e) => Text(e['titulo']))
       ],
     );
   }

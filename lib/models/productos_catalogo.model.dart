@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/widgets.dart';
+
 class ProductosCatalogo {
   final int idSubProducto;
   final int idProducto;
@@ -42,14 +44,17 @@ class ProductosCatalogo {
       };
 }
 
-
 class RequisitosProducto {
   final List<String> datos;
   final String titulo;
+  final IconData icono;
+  final String iconIni;
 
-  RequisitosProducto({
+  RequisitosProducto( {
     required this.datos,
     required this.titulo,
+    required this.icono,
+    required this.iconIni,
   });
 
   factory RequisitosProducto.fromRawJson(String str) =>
@@ -60,11 +65,15 @@ class RequisitosProducto {
   factory RequisitosProducto.fromJson(Map<String, dynamic> json) =>
       RequisitosProducto(
         datos: List<String>.from(json["datos"].map((x) => x)),
-        titulo: json["titulo"],
+        titulo: json["titulo"], 
+        icono: json["icono"], 
+        iconIni: json["iconIni"],
       );
 
   Map<String, dynamic> toJson() => {
         "datos": List<dynamic>.from(datos.map((x) => x)),
         "titulo": titulo,
+        "icono":icono,
+        "iconIni":iconIni
       };
 }

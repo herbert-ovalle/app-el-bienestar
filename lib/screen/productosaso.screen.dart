@@ -160,7 +160,7 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
                                           SizedBox(width: 5),
                                           Expanded(
                                             child: Text(
-                                              "Los saldos que se muestran a continuación corresponden a la fecha",
+                                              "Nota: los saldos que se muestran a continuación corresponden a la fecha",
                                               textAlign: TextAlign.justify,
                                               style: TextStyle(
                                                 fontSize: 16,

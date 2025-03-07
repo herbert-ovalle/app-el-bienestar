@@ -456,8 +456,12 @@ class _IconosProducto extends StatelessWidget {
       padding: const EdgeInsets.only(right: 5, left: 5),
       child: GestureDetector(
         onTap: () async {
-          List<dynamic> catalogo =
-              jsonDecode(await SaveLocal().get("catalogoLocal"));
+          String cat = await SaveLocal().get("catalogoLocal");
+          List<dynamic> catalogo = [];
+          
+          if (cat.isNotEmpty) {
+            catalogo = jsonDecode(cat);
+          }
 
           List<ProductosCatalogo> datosPro = [];
           if (catalogo.isNotEmpty) {
