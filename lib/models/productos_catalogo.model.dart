@@ -41,3 +41,30 @@ class ProductosCatalogo {
         "requisitos": requisitos,
       };
 }
+
+
+class RequisitosProducto {
+  final List<String> datos;
+  final String titulo;
+
+  RequisitosProducto({
+    required this.datos,
+    required this.titulo,
+  });
+
+  factory RequisitosProducto.fromRawJson(String str) =>
+      RequisitosProducto.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory RequisitosProducto.fromJson(Map<String, dynamic> json) =>
+      RequisitosProducto(
+        datos: List<String>.from(json["datos"].map((x) => x)),
+        titulo: json["titulo"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "datos": List<dynamic>.from(datos.map((x) => x)),
+        "titulo": titulo,
+      };
+}

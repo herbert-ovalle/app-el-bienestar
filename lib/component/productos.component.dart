@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +11,10 @@ class ProductosScreen extends StatelessWidget {
   final List<ProductosCatalogo> prodCat;
 
   const ProductosScreen(
-      {super.key, required this.tituloAppBar, required this.tipo, required this.prodCat});
+      {super.key,
+      required this.tituloAppBar,
+      required this.tipo,
+      required this.prodCat});
 
   @override
   Widget build(BuildContext context) {
@@ -31,28 +37,29 @@ class ProductosScreen extends StatelessWidget {
                     : "assets/LOGO_AZUL.png"),
                 height: 50,
               ),
-              if([0,1,2].contains(tipo))
-              TextButton(
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
+              if ([0, 1, 2].contains(tipo))
+                TextButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                        WidgetStateProperty.all<Color>(Colors.blue),
+                  ),
+                  onPressed: () {},
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.link,
+                        color: Colors.white,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text('Solicite $tituloAppBar',
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
                 ),
-                onPressed: () {},
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.link,
-                      color: Colors.white,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text('Solicite $tituloAppBar',
-                        style: TextStyle(color: Colors.white)),
-                  ],
-                ),
-              ),
               Expanded(
                 child: SingleChildScrollView(
                     child: Container(
@@ -68,7 +75,7 @@ class ProductosScreen extends StatelessWidget {
                                 )
                               : null,
                         ),
-                        child: debolverProducto(tipo,prodCat))),
+                        child: debolverProducto(tipo, prodCat))),
               ),
             ],
           ),
@@ -79,12 +86,14 @@ class ProductosScreen extends StatelessWidget {
 }
 
 Widget debolverProducto(int tipo, List<ProductosCatalogo> prodCat) {
-   if (prodCat.isNotEmpty) {
+  if (prodCat.isNotEmpty) {
     return Column(children: [
       ...prodCat.map((e) => InformacionProducto(
-          titulo: e.subProducto,
-          descripcion: e.descripcion,
-          imagen: "assets/productos/${e.urlFotografia}"))
+            titulo: e.subProducto,
+            descripcion: e.descripcion,
+            imagen: "assets/productos/${e.urlFotografia}",
+            lstRequisitos: e.requisitos,
+          ))
     ]);
   }
 
@@ -292,16 +301,22 @@ class InformacionProducto extends StatelessWidget {
   final String titulo;
   final String descripcion;
   final String imagen;
+  final dynamic lstRequisitos;
 
   const InformacionProducto({
     super.key,
     required this.titulo,
     required this.descripcion,
     required this.imagen,
+    this.lstRequisitos,
   });
 
   @override
   Widget build(BuildContext context) {
+    Map<String, dynamic> valores = jsonDecode(lstRequisitos);
+    List<dynamic> listValores = valores.values.toList()[0];
+
+   
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -321,6 +336,7 @@ class InformacionProducto extends StatelessWidget {
           image: AssetImage(imagen),
         ),
         SizedBox(height: 10),
+        ...listValores.map((e) => Text(e['titulo']))
       ],
     );
   }
