@@ -192,6 +192,8 @@ class _FormularioComponentState extends State<FormularioComponent> {
       child: AsyncButtonBuilder(
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
+            FocusScope.of(context).unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
             final datUser = RegistroUsuario.fromJson(datoUser.datosUsuario);
             Respuesta res = await showLoadingDialog(
                 context, UsuarioAsociadoN().guardarAsociado(datUser.toJson()));
@@ -205,7 +207,6 @@ class _FormularioComponentState extends State<FormularioComponent> {
               _direccionController.clear();
               _contrasenaController.clear();
               // ignore: use_build_context_synchronously
-              FocusScope.of(context).unfocus();
               Navigator.push(
                   // ignore: use_build_context_synchronously
                   context,

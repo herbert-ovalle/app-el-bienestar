@@ -1,4 +1,5 @@
 import 'package:app_bienestar/class/preferences.theme.dart';
+import 'package:app_bienestar/providers/guardar_usuario.dart';
 import 'package:app_bienestar/providers/registro_user.dart';
 import 'package:app_bienestar/themes/tema_app.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
             create: (BuildContext context) => DatosUsuarioProvider()),
+        ChangeNotifierProvider(
+            create: (BuildContext context) => UsuarioAsociadoN()),
       ],
       child: MaterialApp(
         title: 'Aplicación del Bienestar',

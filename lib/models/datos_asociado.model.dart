@@ -26,14 +26,15 @@ class DatosAsociado {
             json["captaciones"].map((x) => Captacione.fromJson(x))),
         colocaciones: List<Captacione>.from(
             json["colocaciones"].map((x) => Captacione.fromJson(x))),
-        solicitudes: List<SolicitudesRegistra>.from(json["solicitudes"].map((x) => SolicitudesRegistra.fromJson(x))),
+        solicitudes: List<SolicitudesRegistra>.from(
+            json["solicitudes"].map((x) => SolicitudesRegistra.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
         "info_asociado": infoAsociado.toJson(),
         "captaciones": List<dynamic>.from(captaciones.map((x) => x.toJson())),
         "colocaciones": List<dynamic>.from(colocaciones.map((x) => x.toJson())),
-        "solicitudes" : List<dynamic>.from(solicitudes.map((x) => x)),
+        "solicitudes": List<dynamic>.from(solicitudes.map((x) => x)),
       };
 }
 
@@ -104,12 +105,14 @@ class InfoAsociado {
 }
 
 class SolicitudesRegistra {
+  final int idSolicitud;
   final String producto;
   final String descripcion;
   final String estadoSolicitud;
   final DateTime fechaRegistro;
 
   SolicitudesRegistra({
+    required this.idSolicitud, 
     required this.producto,
     required this.descripcion,
     required this.estadoSolicitud,
@@ -123,6 +126,7 @@ class SolicitudesRegistra {
 
   factory SolicitudesRegistra.fromJson(Map<String, dynamic> json) =>
       SolicitudesRegistra(
+        idSolicitud: valEntero(json['idSolicitud'] ?? 0),
         producto: json["producto"],
         descripcion: json["descripcion"],
         estadoSolicitud: json["estadoSolicitud"],
@@ -130,6 +134,7 @@ class SolicitudesRegistra {
       );
 
   Map<String, dynamic> toJson() => {
+        "idSolicitud": idSolicitud,
         "producto": producto,
         "descripcion": descripcion,
         "estadoSolicitud": estadoSolicitud,
@@ -137,4 +142,3 @@ class SolicitudesRegistra {
             "${fechaRegistro.year.toString().padLeft(4, '0')}-${fechaRegistro.month.toString().padLeft(2, '0')}-${fechaRegistro.day.toString().padLeft(2, '0')}",
       };
 }
-

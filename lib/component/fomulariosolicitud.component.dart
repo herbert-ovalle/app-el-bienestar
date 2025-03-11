@@ -124,8 +124,16 @@ class _FormularioSolicitudState extends State<FormularioSolicitud> {
                       },
                       style: ButtonStyle(
                           foregroundColor: WidgetStatePropertyAll(Colors.red)),
-                      child: const Text('Salir'),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.close, color: Colors.red),
+                          SizedBox(width: 5,),
+                          const Text('Salir'),
+                        ],
+                      ),
                     ),
+                    SizedBox(width: 40),
                     ElevatedButton(
                       onPressed: () async {
                         if (!_formKey.currentState!.validate()) return;
@@ -148,7 +156,17 @@ class _FormularioSolicitudState extends State<FormularioSolicitud> {
                           Navigator.of(context).pop();
                         }
                       },
-                      child: const Text('Enviar Solicitud'),
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(Colors.green)
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.save,color: Colors.white),
+                          SizedBox(width: 5,),
+                          const Text('Enviar Solicitud', style: TextStyle(color: Colors.white),),
+                        ],
+                      ),
                     ),
                     
                   ],

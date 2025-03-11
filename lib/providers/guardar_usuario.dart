@@ -1,4 +1,3 @@
-
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/services/z_service.dart';
 
@@ -42,6 +41,11 @@ class UsuarioAsociadoN extends ChangeNotifier {
   Future<Respuesta> guardarSolicitud(RegistroSolicitud solicitud) async {
     Respuesta res =
         await peticion.query(url: "guardarSolicitud", body: solicitud.toJson());
+    return res;
+  }
+
+  Future<Respuesta> eliminarSolicitud(SolicitudesRegistra solicitud) async {
+    Respuesta res = await peticion.query(url: "eliSolicitud", body: {'idSolicitud': solicitud.idSolicitud});
     return res;
   }
 }
