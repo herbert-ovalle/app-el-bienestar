@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/component/z_component.dart';
+import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/screen/login.screen.dart';
 import 'package:app_bienestar/screen/map.screen.dart';
-import 'package:app_bienestar/services/qExterno.service.dart';
+import 'package:app_bienestar/services/z_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -13,6 +16,8 @@ class HomeBienestar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String tituloPro = "Solicite su ahorro, crédito y seguro de vida";
+
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -40,28 +45,41 @@ class HomeBienestar extends StatelessWidget {
         RegistroButton(),
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.shopping_bag,
-                    color: Colors.blue.shade700, size: 24), // Icono decorativo
-                const SizedBox(width: 8),
-                Text(
-                  "Solicite Ahorros y Creditos",
-                  style: TextStyle(
-                    fontSize: 24, // Tamaño más grande
-                    foreground: Paint()
-                      ..shader = LinearGradient(
-                        colors: <Color>[
-                          Colors.blue.shade600,
-                          Colors.blue.shade400,
-                        ],
-                      ).createShader(Rect.fromLTWH(
-                          0.0, 0.0, 200.0, 70.0)), // Gradiente en el texto
-                  ),
-                ),
-              ],
+            MarqueeText(
+              maxText: tituloPro.length.toDouble(),
+              titulo: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Icon(Icons.shopping_bag,
+                      color: Preferences.isDarkmode
+                          ? Colors.white
+                          : Colors.blue.shade700,
+                      size: 24), // Icono decorativo
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      tituloPro,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 22,
+                        foreground: Paint()
+                          ..shader = LinearGradient(
+                            colors: Preferences.isDarkmode
+                                ? <Color>[Colors.white, Colors.white]
+                                : <Color>[
+                                    Colors.blue.shade600,
+                                    Colors.blue.shade400,
+                                  ],
+                          ).createShader(Rect.fromLTWH(
+                              0.0, 0.0, 200.0, 70.0)), // Gradiente en el texto
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ],
         ),
@@ -76,12 +94,17 @@ class HomeBienestar extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     decoration: BoxDecoration(
-                      color: Preferences.isDarkmode ? Colors.blue[100] : Colors.green.shade100,
+                      color: Preferences.isDarkmode
+                          ? Colors.blue[100]
+                          : Colors.green.shade100,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
                           // ignore: deprecated_member_use
-                          color: Preferences.isDarkmode ? Colors.transparent : Colors.green.shade300.withOpacity(0.5),
+                          color: Preferences.isDarkmode
+                              ? Colors.transparent
+                              // ignore: deprecated_member_use
+                              : Colors.green.shade300.withOpacity(0.5),
                           blurRadius: 8,
                           offset: Offset(0, 4), // Sombra para destacar
                         ),
@@ -94,7 +117,7 @@ class HomeBienestar extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 2,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -102,12 +125,13 @@ class HomeBienestar extends StatelessWidget {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(left: 20),
-                      child: Text("Aplicaciones"),
+                      child:
+                          Text("Aplicaciones", style: TextStyle(fontSize: 14)),
                     ),
                   ],
                 ),
                 SizedBox(
-                  height: 5,
+                  height: 2,
                 ),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -124,6 +148,7 @@ class HomeBienestar extends StatelessWidget {
                                 MaterialPageRoute(
                                     builder: (context) => MapSample()));
                           }),
+                      SizedBox(width: 10),
                       _OpcionDos(
                           assetsvg: "assets/loginsvg.svg",
                           titulo: "Ingresar app",
@@ -156,14 +181,14 @@ class TasaCambioP extends StatelessWidget {
         future: PeticionesExternas().postTasaCambio(),
         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
           if (snapshot.hasData) {
-             return Row(
+            return Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Tasa de Cambio Oficial:", // Descripción más clara
+                      "Tasa de cambio oficial:", // Descripción más clara
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -184,15 +209,21 @@ class TasaCambioP extends StatelessWidget {
               ],
             );
           } else if (snapshot.hasError) {
-            return Center(child: Text("N/D"));
-          }
-          else{
-           return Center(child: Column( children : <Widget>[
-              SizedBox(width: 20, height: 20, child: CircularProgressIndicator()),
-              Padding(padding: EdgeInsets.only(top: 14), child: Text('Actualizando tasa cambio...')),
+            return Center(
+                child: Text("Sin conexión",
+                    style: TextStyle(color: Colors.black)));
+          } else {
+            return Center(
+                child: Column(children: <Widget>[
+              SizedBox(
+                  width: 15, height: 15, child: CircularProgressIndicator()),
+              Padding(
+                  padding: EdgeInsets.only(top: 8),
+                  child: Text('Actualizar tasa cambio...',
+                      style: TextStyle(color: Colors.redAccent))),
             ]));
           }
-      });
+        });
   }
 }
 
@@ -358,40 +389,52 @@ class _OpcionDos extends StatelessWidget {
   final String? assetsvg;
   final Function(TapDownDetails valor) onTap;
 
-  const _OpcionDos(
-      { required this.titulo, this.assetsvg, required this.onTap});
+  const _OpcionDos({required this.titulo, this.assetsvg, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    double tamanosvg = Preferences.isDarkmode ? 35 : 40;
+
     return GestureDetector(
       onTapDown: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        decoration: BoxDecoration(shape: BoxShape.circle, color: Preferences.isDarkmode ? Colors.white : Colors.grey[100]),
-        child: CircleAvatar(
-          maxRadius: 40,
-          backgroundColor: Preferences.isDarkmode ? Colors.black26 : Colors.transparent,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (assetsvg != null)
-                SvgPicture.asset(assetsvg ?? "", height: 48, width: 48),
-
-              Text(
-                titulo,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Preferences.isDarkmode ? Colors.green : Colors.blue.shade700, // Texto blanco
-                ),
+      child: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.green,
+                width: Preferences.isDarkmode ? 3.0 : 1.0,
               ),
-            ],
+            ),
+            child: CircleAvatar(
+              maxRadius: Preferences.isDarkmode ? 28 : 34,
+              backgroundColor: Preferences.isDarkmode
+                  ? Color.fromARGB(171, 117, 117, 117)
+                  : Colors.grey[100],
+              child: SvgPicture.asset(
+                assetsvg ?? "",
+                height: tamanosvg,
+                width: tamanosvg,
+                colorFilter: Preferences.isDarkmode
+                    ? ColorFilter.mode(Colors.green, BlendMode.srcIn)
+                    : null,
+              ),
+            ),
           ),
-        ),
+          SizedBox(height: 1),
+          Text(
+            titulo,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: Preferences.isDarkmode
+                  ? Colors.white
+                  : Colors.blue.shade700, // Texto blanco
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -412,13 +455,30 @@ class _IconosProducto extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 5, left: 5),
       child: GestureDetector(
-        onTap: () {
+        onTap: () async {
+          //await PeticionesExternas().catalogoIncial();
+          String cat = await SaveLocal().get("catalogoLocal");
+          List<dynamic> catalogo = [];
+          
+          if (cat.isNotEmpty) {
+            catalogo = jsonDecode(cat);
+          }
+
+          List<ProductosCatalogo> datosPro = [];
+          if (catalogo.isNotEmpty) {
+            datosPro = catalogo
+                .where((x) => x['idProducto'] == (index + 1))
+                .map((e) => ProductosCatalogo.fromJson(e))
+                .toList();
+          }
           Navigator.push(
+            // ignore: use_build_context_synchronously
             context,
             MaterialPageRoute(
                 builder: (context) => ProductosScreen(
                       tituloAppBar: titulo,
                       tipo: index,
+                      prodCat: datosPro,
                     )),
           );
         },
@@ -428,19 +488,34 @@ class _IconosProducto extends StatelessWidget {
           height: 125,
           width: 140,
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12.0), color: Preferences.isDarkmode ? Colors.white : Colors.grey[100]),
+              borderRadius: BorderRadius.circular(12.0),
+              color: Preferences.isDarkmode
+                  ? const Color.fromARGB(165, 105, 105, 105)
+                  : Colors.grey[100]),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircleAvatar(
-                backgroundColor: Preferences.isDarkmode ? Colors.black54 : Colors.white,
-                maxRadius: 40,
-                child: Icon(
-                  icono,
-                  size: 72,
-                  color: Preferences.isDarkmode ? Colors.white : Colors.blue.shade700,
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 1.0,
+                  ),
+                ),
+                child: CircleAvatar(
+                  backgroundColor:
+                      Preferences.isDarkmode ? Colors.blue[800] : Colors.white,
+                  maxRadius: 40,
+                  child: Icon(
+                    icono,
+                    size: 72,
+                    color: Preferences.isDarkmode
+                        ? Colors.white
+                        : Colors.blue.shade700,
+                  ),
                 ),
               ),
               const SizedBox(height: 5),
@@ -450,9 +525,11 @@ class _IconosProducto extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Preferences.isDarkmode ? Colors.black54 : Colors.blue.shade700,
+                  color: Preferences.isDarkmode
+                      ? Colors.white
+                      : Colors.blue.shade700,
                 ),
               )
             ],
@@ -506,12 +583,18 @@ class _CurrentDateTimeWidgetState extends State<_CurrentDateTimeWidget> {
               ),
               Text(
                 snapshot.data!,
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.black),
+                style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
               ),
             ],
           );
         } else {
-          return Text("Actualizando...", style: TextStyle(fontSize: 18));
+          return Center(
+            child: Text("Actualizando...",
+                style: TextStyle(fontSize: 16, color: Colors.redAccent)),
+          );
         }
       },
     );

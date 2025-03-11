@@ -1,9 +1,12 @@
-
+import 'package:app_bienestar/component/formgeneral.component.dart';
+import 'package:app_bienestar/component/spiner-asincrono.component.dart';
 import 'package:app_bienestar/models/z_model.dart';
+import 'package:app_bienestar/providers/guardar_usuario.dart';
 import 'package:app_bienestar/providers/registro_user.dart';
+import 'package:app_bienestar/screen/login.screen.dart';
 import 'package:app_bienestar/themes/tema_app.dart';
+import 'package:async_button_builder/async_button_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -97,13 +100,16 @@ class _FormularioComponentState extends State<FormularioComponent> {
                     validar: Validar(maxLength: 9, minLength: 9)),
 
                 InputForm(
-                    name: "nombre",
+                    name: "nombres",
                     controller: _nombreController,
                     label: "Nombre",
                     hint: "Ingrese su nombre completo",
                     focusNode: _nombreFocus,
                     campoObli: true,
                     validar: Validar(maxLength: 60, minLength: 12)),
+
+                // Contraseña
+                _buildPasswordField(),
 
                 InputForm(
                   name: "correo",
@@ -131,17 +137,7 @@ class _FormularioComponentState extends State<FormularioComponent> {
                     controller: _direccionController,
                     label: "Dirección",
                     hint: "Ingrese su dirección"),
-                // Usuario
-                /*InputForm(
-                  name: "usuario",
-                  controller: _usuarioController,
-                  label: "Usuario",
-                  hint: "Ingrese un usuario",
-                  campoObli: true,
-                  validar: Validar(maxLength: 10, minLength: 5),
-                ),*/
-                // Contraseña
-                _buildPasswordField(),
+
                 // Botón de envío
                 _buildSubmitButton(context),
               ],
@@ -193,125 +189,67 @@ class _FormularioComponentState extends State<FormularioComponent> {
     final datoUser = Provider.of<DatosUsuarioProvider>(context);
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
-        onPressed: () {
+      child: AsyncButtonBuilder(
+        onPressed: () async {
           if (_formKey.currentState!.validate()) {
             FocusScope.of(context).unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
             final datUser = RegistroUsuario.fromJson(datoUser.datosUsuario);
-            debugPrint(datUser.toRawJson());
-            // Aquí podrías enviar los datos a un backend o hacer otra acción
+            Respuesta res = await showLoadingDialog(
+                context, UsuarioAsociadoN().guardarAsociado(datUser.toJson()));
+
+            if (res.respuesta == "success") {
+              datoUser.limpiarDatos();
+              _dpiController.clear();
+              _telefonoController.clear();
+              _nombreController.clear();
+              _correoController.clear();
+              _direccionController.clear();
+              _contrasenaController.clear();
+              // ignore: use_build_context_synchronously
+              Navigator.push(
+                  // ignore: use_build_context_synchronously
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BankLoginScreen(
+                            dpiI: datUser.dpi.toString(),
+                          )));
+            }
+
+            // ignore: use_build_context_synchronously
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Registro exitoso")),
+              SnackBar(content: Text(res.mensaje)),
             );
           }
         },
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.save, color: Colors.white),
-            SizedBox(
-              width: 5,
+        builder: (BuildContext context, Widget child,
+            Future<void> Function()? callback, ButtonState buttonState) {
+          final buttonColor = buttonState.when(
+            idle: () => Colors.blue,
+            loading: () => Colors.grey,
+            success: () => Colors.green,
+            error: (err, stack) => Colors.orange,
+          );
+
+          return ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: buttonColor),
+            onPressed: callback,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.save, color: Colors.white),
+                SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  "Registrar",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
             ),
-            Text(
-              "Registrar",
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class InputForm extends StatefulWidget {
-  const InputForm({
-    super.key,
-    required this.controller,
-    required this.label,
-    required this.hint,
-    required this.name,
-    this.keyboardType = TextInputType.text,
-    this.validator,
-    this.focusNode,
-    this.nextFocus,
-    this.autoFocus = false,
-    this.formatters,
-    this.campoObli = false,
-    this.validar,
-  });
-
-  final String name;
-  final TextEditingController controller;
-  final String label;
-  final String hint;
-  final TextInputType keyboardType;
-  final String? Function(String?)? validator;
-  final FocusNode? focusNode;
-  final FocusNode? nextFocus;
-  final bool autoFocus;
-  final List<TextInputFormatter>? formatters;
-  final bool campoObli;
-  final Validar? validar;
-
-  @override
-  State<InputForm> createState() => _InputFormState();
-}
-
-class _InputFormState extends State<InputForm> {
-  @override
-  void initState() {
-    super.initState();
-    /*WidgetsBinding.instance.addPostFrameCallback((_) {
-      final datoUser =
-          Provider.of<DatosUsuarioProvider>(context, listen: false);
-      datoUser.setDato(widget.name, "");
-    });*/
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final datoUser = Provider.of<DatosUsuarioProvider>(context);
-    Validar valida = widget.validar ?? Validar.defaultValues();
-    effectiveValidator(value) {
-      if (widget.campoObli) {
-        if (widget.validator != null) {
-          return widget.validator!(value);
-        }
-        if (value.isEmpty || value.length < valida.minLength) {
-          return "El campo ${widget.label} es obligatorio";
-        }
-      } else {
-        return null;
-      }
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 7),
-      child: TextFormField(
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        controller: widget.controller,
-        style: AppTheme.textStyleInput(),
-        keyboardType: widget.keyboardType,
-        focusNode: widget.focusNode,
-        autofocus: widget.autoFocus,
-        inputFormatters: widget.formatters ?? [], // Evita errores con null
-        textInputAction: widget.nextFocus != null
-            ? TextInputAction.next
-            : TextInputAction.done,
-        decoration: AppTheme.inputDecoration(
-            label: widget.label,
-            hint: widget.hint,
-            requerido: widget.campoObli),
-        validator: effectiveValidator,
-        onFieldSubmitted: (_) {
-          if (widget.nextFocus != null) {
-            FocusScope.of(context).requestFocus(widget.nextFocus);
-          }
+          );
         },
-        onChanged: (value) {
-          datoUser.datosUsuario[widget.name] = value;
-        },
+        child: Text("Guardar usuario"),
       ),
     );
   }
