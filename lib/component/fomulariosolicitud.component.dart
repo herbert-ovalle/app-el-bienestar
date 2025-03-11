@@ -1,25 +1,33 @@
 import 'package:app_bienestar/component/formgeneral.component.dart';
+import 'package:app_bienestar/component/spiner-asincrono.component.dart';
 import 'package:app_bienestar/models/z_model.dart';
+import 'package:app_bienestar/providers/guardar_usuario.dart';
 import 'package:app_bienestar/providers/registro_user.dart';
+import 'package:app_bienestar/services/z_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_multi_formatter/formatters/currency_input_formatter.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:provider/provider.dart';
 
 class FormularioSolicitud extends StatefulWidget {
   const FormularioSolicitud(
-      {super.key, required this.titulo, required this.lstCatalogo});
+      {super.key,
+      required this.titulo,
+      required this.lstCatalogo,
+      required this.tipo});
   final String titulo;
   final List<ProductosCatalogo> lstCatalogo;
+  final int tipo;
 
   @override
   State<FormularioSolicitud> createState() => _FormularioSolicitudState();
 }
 
 class _FormularioSolicitudState extends State<FormularioSolicitud> {
-  final TextEditingController _teleAsoController  = TextEditingController();
-  final TextEditingController _cuiController      = TextEditingController();
-  final TextEditingController _montoController    = TextEditingController();
-  final TextEditingController _cometarioController    = TextEditingController();
+  final TextEditingController _teleAsoController = TextEditingController();
+  final TextEditingController _cuiController = TextEditingController();
+  final TextEditingController _montoController = TextEditingController();
+  final TextEditingController _cometarioController = TextEditingController();
 
   final FocusNode _cuiFocus = FocusNode();
   final _formKey = GlobalKey<FormState>();
@@ -82,37 +90,68 @@ class _FormularioSolicitudState extends State<FormularioSolicitud> {
                 DropList(lstCatalogo: widget.lstCatalogo),
                 const SizedBox(height: 15),
                 InputForm(
-                    name: "comentario",
+                    name: "comentarioAso",
                     controller: _cometarioController,
                     label: "Comentario",
                     maxlines: 4,
                     hint: "Comentario",
                     campoObli: false),
                 const SizedBox(height: 15),
-                InputForm(
-                    name: "motoSolicitado",
-                    controller: _montoController,
-                    label: "Monto",
-                    hint: "Monto Solicitado",
-                    keyboardType: TextInputType.number,
-                    campoObli: false,
-                    formatters: [
-                      MaskTextInputFormatter(
-                          mask: '###,###,###.##',
-                          filter: {"#": RegExp(r'[0-9]')},
-                          type: MaskAutoCompletionType.lazy)
-                    ],
-                    validar: Validar(maxLength: 9, minLength: 9)),
+                if (widget.tipo == 1)
+                  InputForm(
+                      name: "montoSolicitado",
+                      controller: _montoController,
+                      label: "Monto",
+                      hint: "Monto Solicitado",
+                      keyboardType: TextInputType.number,
+                      campoObli: false,
+                      formatters: [
+                        CurrencyInputFormatter(
+                          leadingSymbol: 'Q', // Símbolo de moneda
+                          useSymbolPadding:
+                              true, // Espacio entre el símbolo y el número
+                        ),
+                      ],
+                      validar: Validar(maxLength: 9, minLength: 9)),
                 const SizedBox(height: 15),
-                ElevatedButton(
-                  onPressed: () {
-                    if (!_formKey.currentState!.validate()) return;
-                    final datoUser = Provider.of<DatosUsuarioProvider>(context,listen: false);
-                    print(datoUser.datosUsuario);
-                    // Lógica para enviar la solicitud
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Enviar Solicitud'),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      style: ButtonStyle(
+                          foregroundColor: WidgetStatePropertyAll(Colors.red)),
+                      child: const Text('Salir'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (!_formKey.currentState!.validate()) return;
+                        FocusScope.of(context).unfocus();
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        final datoUser = Provider.of<DatosUsuarioProvider>(
+                            context,
+                            listen: false);
+
+                        final res = await showLoadingDialog(
+                            context,
+                            UsuarioAsociadoN().guardarSolicitud(
+                                RegistroSolicitud.fromJson(
+                                    datoUser.datosUsuario)));
+
+                        await ReproductorMusic().showBankSnackBar(res.mensaje);
+
+                        if (res.respuesta == 'success') {
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      child: const Text('Enviar Solicitud'),
+                    ),
+                    
+                  ],
                 ),
               ],
             ),

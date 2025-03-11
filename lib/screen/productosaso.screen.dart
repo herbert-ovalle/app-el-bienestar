@@ -75,160 +75,192 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
               });
               await _futureData;
             },
-            child: Column(
-              children: [
-                 Image.asset(
-                  Preferences.isDarkmode
-                      ? "assets/LOGO_BLANCO.png"
-                      : "assets/LOGO_AZUL.png",
-                  width: 1000,
-                  height: 60,
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                 constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context)
+                      .size
+                      .height, // Altura mínima de la pantalla
                 ),
-                SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      FutureBuilder(
-                          future: _futureData,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<Respuesta> snapshot) {
-                            List<Widget> children;
-                            if (snapshot.hasData) {
-                              final res = snapshot.data!;
-                              if (res.respuesta != "success") {
-                                if (res.eliSess == 1) {
-                                  SaveLocal().deleteAll().then((_) => {});
-                                }
-                
-                                return Center(
-                                  child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Icon(
-                                            res.respuesta == "info"
-                                                ? Icons.info
-                                                : Icons.error_outline,
-                                            color: res.respuesta == "info"
-                                                ? Colors.blue
-                                                : Colors.red,
-                                            size: 60),
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 15),
-                                          child: Text(res.mensaje,
-                                              style: TextStyle(fontSize: 18)),
-                                        ),
-                                      ]),
-                                );
-                              }
-                
-                              final resDatos =
-                                  DatosAsociado.fromJson(res.datos![0]);
-                              final datosUser = resDatos.infoAsociado;
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _InfoAsociado(
-                                        titulo: "Nombre:",
-                                        subtitulo: datosUser.nombres),
-                                    _InfoAsociado(
-                                        titulo: "CUI:", subtitulo: datosUser.dpi),
-                                    _InfoAsociado(
-                                        titulo: "Teléfono:",
-                                        subtitulo: datosUser.telefono),
-                                    _InfoAsociado(
-                                        titulo: "Correo:",
-                                        subtitulo:
-                                            datosUser.correoElectronico.toString()),
-                                    Container(
-                                      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 4), // Margen exterior
-                                      padding: EdgeInsets.all(8), // Espaciado interno
-                                      decoration: BoxDecoration(
-                                        color: Colors.orange[100], // Fondo amarillo suave
-                                        borderRadius: BorderRadius.circular(10), // Bordes redondeados
-                                        border: Border.all(color: Colors.orange[700]!, width: 1.5), // Borde llamativo
-                                      ),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          Icon(Icons.warning_amber_rounded, color: Colors.orange[800], size: 28), // Ícono de advertencia
-                                          SizedBox(width: 5),
-                                          Expanded(
-                                            child: Text(
-                                              "Nota: los saldos que se muestran a continuación corresponden a la fecha",
-                                              textAlign: TextAlign.justify,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                                color: Colors.orange[900], // Texto en naranja oscuro
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text("Ahorros",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20)),
-                                    ...resDatos.captaciones.map((e) => ProductosAsoS(
-                                              info: e,
-                                            )),
-                                    SizedBox(height: 10),
-                                    if (resDatos.colocaciones.isNotEmpty)
-                                      Text("Prestamos",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20)),
-                                    ...resDatos.colocaciones
-                                        .map((e) => ProductosAsoS(info: e,)),
-                                    SizedBox(height: 10),
-                                    if (resDatos.solicitudes.isNotEmpty)
-                                      Text("Solicitudes:",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20)),
-                                    SizedBox(height: 50),
-                                  ],
-                                ),
-                              );
-                            } else if (snapshot.hasError) {
-                              children = <Widget>[
-                                const Icon(Icons.error_outline,
-                                    color: Colors.red, size: 60),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 16),
-                                  child: Text('Error: ${snapshot.error}'),
-                                ),
-                              ];
-                            } else {
-                              children = const <Widget>[
-                                SizedBox(
-                                    width: 60,
-                                    height: 60,
-                                    child: CircularProgressIndicator()),
-                                Padding(
-                                    padding: EdgeInsets.only(top: 16),
-                                    child: Text('Consultado...')),
-                              ];
-                            }
-                            return Center(
-                              child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: children),
-                            );
-                          }),
-                    ],
-                  ),
+                child: Column(
+                  children: [
+                    Image.asset(
+                      Preferences.isDarkmode
+                          ? "assets/LOGO_BLANCO.png"
+                          : "assets/LOGO_AZUL.png",
+                      width: 1000,
+                      height: 60,
+                    ),
+                     SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                       child: Expanded(
+                         child: Column(
+                           children: [
+                             FutureBuilder(
+                                 future: _futureData,
+                                 builder: (BuildContext context,
+                                     AsyncSnapshot<Respuesta> snapshot) {
+                                   List<Widget> children;
+                                   if (snapshot.hasData) {
+                                     final res = snapshot.data!;
+                                     if (res.respuesta != "success") {
+                                       if (res.eliSess == 1) {
+                                         SaveLocal().deleteAll().then((_) => {});
+                                       }
+                                             
+                                       return Center(
+                                         child: Column(
+                                             mainAxisAlignment:
+                                                 MainAxisAlignment.center,
+                                             crossAxisAlignment:
+                                                 CrossAxisAlignment.center,
+                                             mainAxisSize: MainAxisSize.max,
+                                             children: [
+                                               Icon(
+                                                   res.respuesta == "info"
+                                                       ? Icons.info
+                                                       : Icons.error_outline,
+                                                   color: res.respuesta == "info"
+                                                       ? Colors.blue
+                                                       : Colors.red,
+                                                   size: 60),
+                                               Padding(
+                                                 padding:
+                                                     const EdgeInsets.only(top: 15),
+                                                 child: Text(res.mensaje,
+                                                     style: TextStyle(fontSize: 18)),
+                                               ),
+                                             ]),
+                                       );
+                                     }
+                                             
+                                     final resDatos =
+                                         DatosAsociado.fromJson(res.datos![0]);
+                                             
+                                     final datosUser = resDatos.infoAsociado;
+                                     
+                                     return Padding(
+                                       padding: const EdgeInsets.symmetric(horizontal: 10),
+                                       child:   Column(
+                                         crossAxisAlignment: CrossAxisAlignment.start,
+                                         mainAxisSize: MainAxisSize.max,
+                                         children: [
+                                           _InfoAsociado(
+                                               titulo: "Nombre:",
+                                               subtitulo: datosUser.nombres),
+                                           _InfoAsociado(
+                                               titulo: "CUI:",
+                                               subtitulo: datosUser.dpi),
+                                           _InfoAsociado(
+                                               titulo: "Teléfono:",
+                                               subtitulo: datosUser.telefono),
+                                           _InfoAsociado(
+                                               titulo: "Correo:",
+                                               subtitulo: datosUser.correoElectronico
+                                                   .toString()),
+                                           Container(
+                                             margin: EdgeInsets.symmetric(
+                                                 vertical: 6,
+                                                 horizontal: 4), // Margen exterior
+                                             padding: EdgeInsets.all(
+                                                 8), // Espaciado interno
+                                             decoration: BoxDecoration(
+                                               color: Colors.orange[
+                                                   100], // Fondo amarillo suave
+                                               borderRadius: BorderRadius.circular(
+                                                   10), // Bordes redondeados
+                                               border: Border.all(
+                                                   color: Colors.orange[700]!,
+                                                   width: 1.5), // Borde llamativo
+                                             ),
+                                             child: Row(
+                                               crossAxisAlignment:
+                                                   CrossAxisAlignment.center,
+                                               children: [
+                                                 Icon(Icons.warning_amber_rounded,
+                                                     color: Colors.orange[800],
+                                                     size: 28), // Ícono de advertencia
+                                                 SizedBox(width: 5),
+                                                 Expanded(
+                                                   child: Text(
+                                                     "Nota: los saldos que se muestran a continuación corresponden a la fecha",
+                                                     textAlign: TextAlign.justify,
+                                                     style: TextStyle(
+                                                       fontSize: 16,
+                                                       fontWeight: FontWeight.w600,
+                                                       color: Colors.orange[
+                                                           900], // Texto en naranja oscuro
+                                                     ),
+                                                   ),
+                                                 ),
+                                               ],
+                                             ),
+                                           ),
+                                           SizedBox(height: 5),
+                                           Text("Ahorros",
+                                               style: TextStyle(
+                                                   fontWeight: FontWeight.bold,
+                                                   fontSize: 20)),
+                                           ...resDatos.captaciones
+                                               .map((e) => ProductosAsoS(
+                                                     info: e,
+                                                   )),
+                                           SizedBox(height: 10),
+                                           if (resDatos.colocaciones.isNotEmpty)
+                                             Text("Prestamos",
+                                                 style: TextStyle(
+                                                     fontWeight: FontWeight.bold,
+                                                     fontSize: 20)),
+                                           ...resDatos.colocaciones
+                                               .map((e) => ProductosAsoS(
+                                                     info: e,
+                                                   )),
+                                           SizedBox(height: 10),
+                                           if (resDatos.solicitudes.isNotEmpty)
+                                             Text("Solicitudes de producto:",
+                                                 style: TextStyle(
+                                                     fontWeight: FontWeight.bold,
+                                                     fontSize: 20)),
+                                           ...resDatos.solicitudes
+                                               .map((solicitud) => SolicitudesAsociadoScren(e:solicitud)),
+                                           SizedBox(height: 50),
+                                         ],
+                                       ),
+                                     );
+                                   } else if (snapshot.hasError) {
+                                     children = <Widget>[
+                                       const Icon(Icons.error_outline,
+                                           color: Colors.red, size: 60),
+                                       Padding(
+                                         padding: const EdgeInsets.only(top: 16),
+                                         child: Text('Error: ${snapshot.error}'),
+                                       ),
+                                     ];
+                                   } else {
+                                     children = const <Widget>[
+                                       SizedBox(
+                                           width: 60,
+                                           height: 60,
+                                           child: CircularProgressIndicator()),
+                                       Padding(
+                                           padding: EdgeInsets.only(top: 16),
+                                           child: Text('Consultado...')),
+                                     ];
+                                   }
+                                   return Center(
+                                     child: Column(
+                                         mainAxisAlignment: MainAxisAlignment.center,
+                                         crossAxisAlignment: CrossAxisAlignment.center,
+                                         children: children),
+                                   );
+                                 }),
+                           ],
+                         ),
+                       ),
+                     ),
+                  ],
                 ),
-              ],
+              ),
             )),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
@@ -248,17 +280,97 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
   }
 }
 
+class SolicitudesAsociadoScren extends StatelessWidget {
+  const SolicitudesAsociadoScren({
+    super.key, required this.e,
+  });
+
+  final SolicitudesRegistra e;
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 3, // Sombra para destacar la tarjeta
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12), // Bordes redondeados
+      ),
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  e.producto,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _getEstadoColor(e.estadoSolicitud), // Color dinámico
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    e.estadoSolicitud,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 6),
+            Text(
+              "Fecha: ${_formatFecha(e.fechaRegistro)}",
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+}
+
+
+
+Color _getEstadoColor(String estado) {
+    switch (estado.toLowerCase()) {
+      case "pendiente":
+        return Colors.orange;
+      case "aprobado":
+        return Colors.green;
+      case "rechazado":
+        return Colors.red;
+      default:
+        return Colors.blueGrey;
+    }
+  }
+
+  // Función para formatear la fecha
+  String _formatFecha(DateTime fecha) {
+    return "${fecha.day}/${fecha.month}/${fecha.year}";
+  }
+}
 class ProductosAsoS extends StatelessWidget {
   const ProductosAsoS({
-    super.key, required this.info,
+    super.key,
+    required this.info,
   });
   final Captacione info;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-       margin: EdgeInsets.symmetric(
-          vertical: 4, horizontal: 6), // Espaciado externo
+      margin:
+          EdgeInsets.symmetric(vertical: 4, horizontal: 6), // Espaciado externo
       padding: EdgeInsets.all(10), // Espaciado interno
       decoration: BoxDecoration(
         color: Colors.white, // Fondo blanco
@@ -311,14 +423,16 @@ class ProductosAsoS extends StatelessWidget {
               ),
               Row(
                 children: [
-                  Icon(Icons.account_balance_wallet, color: Colors.green[700], size: 20), // Ícono de billetera
+                  Icon(Icons.account_balance_wallet,
+                      color: Colors.green[700], size: 20), // Ícono de billetera
                   SizedBox(width: 4),
                   Text(
                     formatoMoneda(info.montoDisponible), // Monto formateado
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green[700], // Verde para resaltar saldo positivo
+                      color: Colors
+                          .green[700], // Verde para resaltar saldo positivo
                     ),
                   ),
                 ],

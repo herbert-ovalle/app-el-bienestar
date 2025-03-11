@@ -1,3 +1,4 @@
+
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/services/z_service.dart';
 
@@ -28,12 +29,19 @@ class UsuarioAsociadoN extends ChangeNotifier {
   }
 
   Future<Respuesta> validarDPI(String dpi) async {
-    Map<String,dynamic> datosTok = decodeToken(await SaveLocal().get("token"));
-    if (datosTok.containsKey('usuario') && datosTok["usuario"] == dpi.replaceAll(" ", "")) {
+    Map<String, dynamic> datosTok = decodeToken(await SaveLocal().get("token"));
+    if (datosTok.containsKey('usuario') &&
+        datosTok["usuario"] == dpi.replaceAll(" ", "")) {
       return Respuesta(respuesta: "success", mensaje: "");
     }
 
     Respuesta res = await peticion.query(url: "validaDPI", body: {'dpi': dpi});
+    return res;
+  }
+
+  Future<Respuesta> guardarSolicitud(RegistroSolicitud solicitud) async {
+    Respuesta res =
+        await peticion.query(url: "guardarSolicitud", body: solicitud.toJson());
     return res;
   }
 }

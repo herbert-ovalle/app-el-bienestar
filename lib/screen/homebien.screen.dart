@@ -456,6 +456,7 @@ class _IconosProducto extends StatelessWidget {
       padding: const EdgeInsets.only(right: 5, left: 5),
       child: GestureDetector(
         onTap: () async {
+          //await PeticionesExternas().catalogoIncial();
           String cat = await SaveLocal().get("catalogoLocal");
           List<dynamic> catalogo = [];
           

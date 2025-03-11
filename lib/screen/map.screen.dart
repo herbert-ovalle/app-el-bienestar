@@ -76,7 +76,7 @@ class MapSampleState extends State<MapSample> {
       });
 
       // ignore: use_build_context_synchronously
-      showBankSnackBar(context, "Información", ress.mensaje);
+      showBankSnackBarLocal(context, "Información", ress.mensaje);
 
     }
   }

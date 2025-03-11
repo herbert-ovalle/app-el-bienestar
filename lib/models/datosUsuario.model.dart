@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:app_bienestar/services/z_service.dart';
 
 class RegistroUsuario {
@@ -30,8 +29,8 @@ class RegistroUsuario {
       RegistroUsuario(
         nombres: json["nombres"],
         correo: json["correo"] ?? "",
-        dpi: int.parse(json["dpi"].replaceAll(" ", "")),
-        telefono: valTelefono(json["telefono"]),
+        dpi: valEntero(json["dpi"]),
+        telefono: valEntero(json["telefono"]),
         direccion: json["direccion"] ?? "",
         usuario: json["usuario"] ?? json["dpi"].replaceAll(" ", ""),
         contrasena: encriptarContrasena(json["contrasena"] ?? ""),
@@ -48,13 +47,6 @@ class RegistroUsuario {
       };
 }
 
-int valTelefono(tel) {
-  if (tel.runtimeType == int) {
-    return tel;
-  } else {
-    return int.parse(tel.replaceAll(" ", ""));
-  }
-}
 
 class LoginModel {
   final String usuario;

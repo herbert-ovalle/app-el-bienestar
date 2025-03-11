@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-void showBankSnackBar(BuildContext context, String title, String message) {
+void showBankSnackBarLocal(BuildContext context, String title, String message) {
 
   final snackBar = SnackBar(
     content: Column(

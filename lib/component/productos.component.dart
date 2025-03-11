@@ -48,7 +48,7 @@ class ProductosScreen extends StatelessWidget {
                       barrierDismissible: false,
                       useSafeArea: false,
                       builder: (BuildContext context) {
-                        return FormularioSolicitud(titulo: tituloAppBar,lstCatalogo: prodCat,);
+                        return FormularioSolicitud(titulo: tituloAppBar,lstCatalogo: prodCat,tipo: tipo,);
                       }),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,

@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:app_bienestar/services/z_service.dart';
+
 class DatosAsociado {
   final InfoAsociado infoAsociado;
   final List<Captacione> captaciones;
   final List<Captacione> colocaciones;
-  final List<dynamic> solicitudes;
+  final List<SolicitudesRegistra> solicitudes;
 
   DatosAsociado({
     required this.infoAsociado,
@@ -24,7 +26,7 @@ class DatosAsociado {
             json["captaciones"].map((x) => Captacione.fromJson(x))),
         colocaciones: List<Captacione>.from(
             json["colocaciones"].map((x) => Captacione.fromJson(x))),
-        solicitudes: List<dynamic>.from(json["solicitudes"].map((x) => x)),
+        solicitudes: List<SolicitudesRegistra>.from(json["solicitudes"].map((x) => SolicitudesRegistra.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -56,15 +58,15 @@ class Captacione {
   factory Captacione.fromJson(Map<String, dynamic> json) => Captacione(
         producto: json["producto"],
         tipoProducto: json["tipoProducto"],
-        numeroCuenta: json["NumeroCuenta"],
-        montoDisponible: json["MontoDisponible"].toDouble(),
+        numeroCuenta: valEntero(json["numeroCuenta"]),
+        montoDisponible: json["montoDisponible"].toDouble(),
       );
 
   Map<String, dynamic> toJson() => {
         "producto": producto,
         "tipoProducto": tipoProducto,
-        "NumeroCuenta": numeroCuenta,
-        "MontoDisponible": montoDisponible,
+        "numeroCuenta": numeroCuenta,
+        "montoDisponible": montoDisponible,
       };
 }
 
@@ -100,3 +102,39 @@ class InfoAsociado {
         "dpi": dpi,
       };
 }
+
+class SolicitudesRegistra {
+  final String producto;
+  final String descripcion;
+  final String estadoSolicitud;
+  final DateTime fechaRegistro;
+
+  SolicitudesRegistra({
+    required this.producto,
+    required this.descripcion,
+    required this.estadoSolicitud,
+    required this.fechaRegistro,
+  });
+
+  factory SolicitudesRegistra.fromRawJson(String str) =>
+      SolicitudesRegistra.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory SolicitudesRegistra.fromJson(Map<String, dynamic> json) =>
+      SolicitudesRegistra(
+        producto: json["producto"],
+        descripcion: json["descripcion"],
+        estadoSolicitud: json["estadoSolicitud"],
+        fechaRegistro: DateTime.parse(json["fechaRegistro"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "producto": producto,
+        "descripcion": descripcion,
+        "estadoSolicitud": estadoSolicitud,
+        "fechaRegistro":
+            "${fechaRegistro.year.toString().padLeft(4, '0')}-${fechaRegistro.month.toString().padLeft(2, '0')}-${fechaRegistro.day.toString().padLeft(2, '0')}",
+      };
+}
+

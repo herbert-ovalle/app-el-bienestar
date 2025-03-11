@@ -55,6 +55,7 @@ dependencies:
   intl: any
   flutter_localizations:
     sdk: flutter
+  flutter_multi_formatter: ^2.13.0
 
 dev_dependencies:
   flutter_test:

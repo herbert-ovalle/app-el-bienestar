@@ -193,7 +193,6 @@ class _FormularioComponentState extends State<FormularioComponent> {
         onPressed: () async {
           if (_formKey.currentState!.validate()) {
             final datUser = RegistroUsuario.fromJson(datoUser.datosUsuario);
-            print(datUser.toJson());
             Respuesta res = await showLoadingDialog(
                 context, UsuarioAsociadoN().guardarAsociado(datUser.toJson()));
 

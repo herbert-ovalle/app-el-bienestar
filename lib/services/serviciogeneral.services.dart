@@ -48,3 +48,11 @@ String formatoMoneda(double cantidad) {
     return "0.00";
   }
 }
+
+int valEntero(tel) {
+  if (tel.runtimeType == int) {
+    return tel;
+  } else {
+    return int.parse(tel.replaceAll(" ", ""));
+  }
+}
