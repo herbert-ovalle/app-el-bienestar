@@ -48,4 +48,10 @@ class UsuarioAsociadoN extends ChangeNotifier {
     Respuesta res = await peticion.query(url: "eliSolicitud", body: {'idSolicitud': solicitud.idSolicitud});
     return res;
   }
+
+  Future<Respuesta> cambioContrasena(LoginModel login) async {
+    Respuesta res = await peticion.query(
+        url: "actualizarContra", body: login.toJson());
+    return res;
+  }
 }

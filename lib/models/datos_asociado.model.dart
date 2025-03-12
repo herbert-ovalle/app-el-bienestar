@@ -92,7 +92,7 @@ class InfoAsociado {
   factory InfoAsociado.fromJson(Map<String, dynamic> json) => InfoAsociado(
         nombres: json["nombres"],
         telefono: json["telefono"].toString(),
-        correoElectronico: json["correoElectronico"],
+        correoElectronico: json["correoElectronico"] ?? "",
         dpi: json["dpi"],
       );
 
