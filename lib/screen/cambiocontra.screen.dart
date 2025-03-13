@@ -1,7 +1,9 @@
+import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/component/formgeneral.component.dart';
 import 'package:app_bienestar/component/spiner-asincrono.component.dart';
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/providers/guardar_usuario.dart';
+import 'package:app_bienestar/services/validarotp.services.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -29,12 +31,24 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         "usuario": _cuiController.text,
         "contrasena": _confirmPasswordController.text
       });
-      final res = await showLoadingDialog(context, UsuarioAsociadoN().cambioContrasena(datosCambioC));
+      final res = await showLoadingDialog(
+          context, UsuarioAsociadoN().cambioContrasena(datosCambioC));
 
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(res.mensaje)),
-      );
+      if (res.respuesta == "success") {
+        _cuiController.clear();
+        _newPasswordController.clear();
+        _confirmPasswordController.clear();
+        // ignore: use_build_context_synchronously
+        mostrarDialogoOTP(context,
+            usuario: datosCambioC.usuario,
+            mensaje: "Ingrese su código enviado a su teléfono",
+            otpSession: false);
+      } else {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(res.mensaje)),
+        );
+      }
     }
   }
 
@@ -47,63 +61,81 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         child: Form(
           key: _formKey,
           autovalidateMode: AutovalidateMode.always,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InputForm(
-                  name: "cui",
-                  controller: _cuiController,
-                  focusNode: _cuiFocus,
-                  label: "DPI",
-                  hint: "Ingrese su CUI",
-                  keyboardType: TextInputType.number,
-                  campoObli: true,
-                  autoFocus: true,
-                  formatters: [
-                    MaskTextInputFormatter(
-                        mask: '#### ##### ####',
-                        type: MaskAutoCompletionType.lazy)
-                  ],
-                  validar: Validar(maxLength: 15, minLength: 15)),
-              SizedBox(height: 16),
-              _buildPasswordField(
-                controller: _newPasswordController,
-                label: "Nueva Contraseña",
-                obscureText: _obscureNewPassword,
-                toggleObscure: () {
-                  setState(() => _obscureNewPassword = !_obscureNewPassword);
-                },
-                validator: (value) {
-                  if (value == null || value.length < 6) {
-                    return "La nueva contraseña debe tener al menos 6 caracteres";
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              _buildPasswordField(
-                controller: _confirmPasswordController,
-                label: "Confirmar Nueva Contraseña",
-                obscureText: _obscureConfirmPassword,
-                toggleObscure: () {
-                  setState(
-                      () => _obscureConfirmPassword = !_obscureConfirmPassword);
-                },
-                validator: (value) {
-                  if (value != _newPasswordController.text) {
-                    return "Las contraseñas no coinciden";
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 24),
-              Center(
-                child: ElevatedButton(
-                  onPressed: _changePassword,
-                  child: Text("Guardar Cambios"),
+          child: SingleChildScrollView(
+            physics: AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.asset(
+                  Preferences.isDarkmode
+                      ? "assets/LOGO_BLANCO.png"
+                      : "assets/LOGO_AZUL.png",
+                  width: 1000,
+                  height: 60,
                 ),
-              ),
-            ],
+                SizedBox(height: 10),
+                InputForm(
+                    name: "cui",
+                    controller: _cuiController,
+                    focusNode: _cuiFocus,
+                    label: "DPI",
+                    hint: "Ingrese su CUI",
+                    keyboardType: TextInputType.number,
+                    campoObli: true,
+                    autoFocus: true,
+                    formatters: [
+                      MaskTextInputFormatter(
+                          mask: '#### ##### ####',
+                          type: MaskAutoCompletionType.lazy)
+                    ],
+                    validar: Validar(maxLength: 15, minLength: 15)),
+                SizedBox(height: 16),
+                _buildPasswordField(
+                  controller: _newPasswordController,
+                  label: "Nueva Contraseña",
+                  obscureText: _obscureNewPassword,
+                  toggleObscure: () {
+                    setState(() => _obscureNewPassword = !_obscureNewPassword);
+                  },
+                  validator: (value) {
+                    if (value == null || value.length < 6) {
+                      return "La nueva contraseña debe tener al menos 6 caracteres";
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 16),
+                _buildPasswordField(
+                  controller: _confirmPasswordController,
+                  label: "Confirmar Nueva Contraseña",
+                  obscureText: _obscureConfirmPassword,
+                  toggleObscure: () {
+                    setState(() =>
+                        _obscureConfirmPassword = !_obscureConfirmPassword);
+                  },
+                  validator: (value) {
+                    if (value != _newPasswordController.text) {
+                      return "Las contraseñas no coinciden";
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 24),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _changePassword,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.save),
+                        SizedBox(width: 10),
+                        Text("Guardar Cambios"),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

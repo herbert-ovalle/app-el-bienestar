@@ -333,30 +333,13 @@ class _BankLoginScreenState extends State<BankLoginScreen>
       });
 
       Respuesta res;
-      token = await SaveLocal().get("token");
 
-      if (token.isNotEmpty && !isTokenExpired(token)) {
-        String user = await SaveLocal().get("user");
-        String contra = await SaveLocal().get("contra");
-
-        if (user == _userController.text &&
-            contra == _passwordController.text) {
-          _userController.clear();
-          _passwordController.clear();
-          res = Respuesta(respuesta: "success", mensaje: "Login local");
-        } else {
-          res = Respuesta(
-              respuesta: "warning",
-              mensaje: "Usuario o contraseña incorrecta, verifique");
-          await SaveLocal().deleteAll();
-        }
-      } else {
-        await SaveLocal().deleteAll();
-        res = await showLoadingDialog(
-            // ignore: use_build_context_synchronously
-            context,
-            UsuarioAsociadoN().loginAsociado(datosLogin));
-      }
+      await SaveLocal().deleteAll();
+      res = await showLoadingDialog(
+          // ignore: use_build_context_synchronously
+          context,
+          UsuarioAsociadoN().loginAsociado(datosLogin));
+    
 
       if (res.respuesta == "success") {
         // ignore: use_build_context_synchronously
