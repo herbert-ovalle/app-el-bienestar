@@ -1,6 +1,7 @@
 import 'package:app_bienestar/component/spiner-asincrono.component.dart';
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/providers/guardar_usuario.dart';
+import 'package:app_bienestar/screen/cambiocontra.screen.dart';
 import 'package:app_bienestar/services/validarotp.services.dart';
 import 'package:app_bienestar/services/z_service.dart';
 
@@ -67,7 +68,8 @@ class _BankLoginScreenState extends State<BankLoginScreen>
         // ignore: use_build_context_synchronously
         mostrarDialogoOTP(context,
             usuario: datoUser['usuario'],
-            mensaje: "Ingrese el código de acceso enviado anteriormente a su teléfono");
+            mensaje:
+                "Ingrese el código de acceso enviado anteriormente a su teléfono");
       } else {
         await SaveLocal().deleteAll();
         // ignore: use_build_context_synchronously
@@ -224,11 +226,12 @@ class _BankLoginScreenState extends State<BankLoginScreen>
                                 // "Olvidaste tu contraseña?"
                                 GestureDetector(
                                   onTap: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              "Función de recuperación no implementada")),
-                                    );
+                                     Navigator.push(
+                                      // ignore: use_build_context_synchronously
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => ChangePasswordScreen()));
+                                    
                                   },
                                   child: const Text(
                                     "¿Olvidaste tu contraseña?",
@@ -308,18 +311,17 @@ class _BankLoginScreenState extends State<BankLoginScreen>
     IconData icon,
   ) {
     return InputDecoration(
-      labelText: label,
-      labelStyle: const TextStyle(color: Colors.white),
-      prefixIcon: Icon(icon, color: Colors.white70),
-      filled: true,
-      // ignore: deprecated_member_use
-      fillColor: Colors.white.withOpacity(0.2),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide.none,
-      ),
-      errorStyle: TextStyle(color: Colors.red[400], fontSize: 16)
-    );
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white),
+        prefixIcon: Icon(icon, color: Colors.white70),
+        filled: true,
+        // ignore: deprecated_member_use
+        fillColor: Colors.white.withOpacity(0.2),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
+        ),
+        errorStyle: TextStyle(color: Colors.red[400], fontSize: 16));
   }
 
   // Función de Login
@@ -331,35 +333,17 @@ class _BankLoginScreenState extends State<BankLoginScreen>
       });
 
       Respuesta res;
-      token = await SaveLocal().get("token");
 
-      if (token.isNotEmpty && !isTokenExpired(token)) {
-        String user = await SaveLocal().get("user");
-        String contra = await SaveLocal().get("contra");
-
-        if (user == _userController.text &&
-            contra == _passwordController.text) {
-          _userController.clear();
-          _passwordController.clear();
-          res = Respuesta(respuesta: "success", mensaje: "Login local");
-        } else {
-          res = Respuesta(
-              respuesta: "warning",
-              mensaje: "Usuario o contraseña incorrecta, verifique");
-          await SaveLocal().deleteAll();
-        }
-      } else {
-        await SaveLocal().deleteAll();
-        res = await showLoadingDialog(
-            // ignore: use_build_context_synchronously
-            context,
-            UsuarioAsociadoN().loginAsociado(datosLogin));
-      }
+      await SaveLocal().deleteAll();
+      res = await showLoadingDialog(
+          // ignore: use_build_context_synchronously
+          context,
+          UsuarioAsociadoN().loginAsociado(datosLogin));
+    
 
       if (res.respuesta == "success") {
         // ignore: use_build_context_synchronously
-        mostrarDialogoOTP(context,
-            usuario: datosLogin.usuario);
+        mostrarDialogoOTP(context, usuario: datosLogin.usuario);
         _userController.clear();
         _passwordController.clear();
       }

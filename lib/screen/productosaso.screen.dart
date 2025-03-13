@@ -203,6 +203,7 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
                                         ),
                                       ),
                                       SizedBox(height: 5),
+                                      if(resDatos.colocaciones.isNotEmpty)
                                       Text("Ahorros",
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
@@ -223,7 +224,6 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 20)),
-                                      if (resDatos.colocaciones.isNotEmpty)
                                         ListView.builder(
                                           physics:
                                               NeverScrollableScrollPhysics(),
@@ -242,7 +242,6 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 20)),
-                                      if (resDatos.solicitudes.isNotEmpty)
                                         ListView.builder(
                                           physics:
                                               NeverScrollableScrollPhysics(),
@@ -493,7 +492,7 @@ class ProductosAsoS extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.blue[900], // Azul corporativo
             ),

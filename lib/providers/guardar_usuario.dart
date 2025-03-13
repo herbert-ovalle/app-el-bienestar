@@ -16,7 +16,6 @@ class UsuarioAsociadoN extends ChangeNotifier {
     if (res.respuesta == "success") {
       await SaveLocal().save("token", res.token ?? "");
       await SaveLocal().save("user", datos.usuario);
-      await SaveLocal().save("contra", datos.contrasena);
       await SaveLocal().save("idSession", res.idSession.toString());
     }
     return res;
@@ -45,7 +44,14 @@ class UsuarioAsociadoN extends ChangeNotifier {
   }
 
   Future<Respuesta> eliminarSolicitud(SolicitudesRegistra solicitud) async {
-    Respuesta res = await peticion.query(url: "eliSolicitud", body: {'idSolicitud': solicitud.idSolicitud});
+    Respuesta res = await peticion.query(
+        url: "eliSolicitud", body: {'idSolicitud': solicitud.idSolicitud});
+    return res;
+  }
+
+  Future<Respuesta> cambioContrasena(LoginModel login) async {
+    Respuesta res =
+        await peticion.query(url: "actualizarContra", body: login.toJson());
     return res;
   }
 }

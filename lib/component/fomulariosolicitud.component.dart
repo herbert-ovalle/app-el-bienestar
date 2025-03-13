@@ -128,7 +128,9 @@ class _FormularioSolicitudState extends State<FormularioSolicitud> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.close, color: Colors.red),
-                          SizedBox(width: 5,),
+                          SizedBox(
+                            width: 5,
+                          ),
                           const Text('Salir'),
                         ],
                       ),
@@ -157,18 +159,22 @@ class _FormularioSolicitudState extends State<FormularioSolicitud> {
                         }
                       },
                       style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(Colors.green)
-                      ),
+                          backgroundColor:
+                              WidgetStatePropertyAll(Colors.green)),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.save,color: Colors.white),
-                          SizedBox(width: 5,),
-                          const Text('Enviar Solicitud', style: TextStyle(color: Colors.white),),
+                          Icon(Icons.save, color: Colors.white),
+                          SizedBox(
+                            width: 5,
+                          ),
+                          const Text(
+                            'Enviar Solicitud',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ],
                       ),
                     ),
-                    
                   ],
                 ),
               ],

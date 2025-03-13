@@ -1,10 +1,9 @@
 import 'package:app_bienestar/class/preferences.theme.dart';
-import 'package:app_bienestar/component/formulario.component.dart';
-import 'package:app_bienestar/component/menu_perfil.component.dart';
-import 'package:app_bienestar/component/radio.component.dart';
 import 'package:app_bienestar/screen/config.screen.dart';
 import 'package:app_bienestar/screen/homebien.screen.dart';
 import 'package:app_bienestar/screen/login.screen.dart';
+
+import 'package:app_bienestar/component/z_component.dart';
 import 'package:app_bienestar/services/qExterno.service.dart';
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
@@ -123,6 +122,9 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           },
           items: navBarItems),
+      floatingActionButton: FloatingActionButton.small(onPressed: () async {
+        await showLoadingDialog(context, PeticionesExternas().catalogoIncial(soloPeticion: true));
+      }, child: Icon(Icons.update),),
     );
   }
 
