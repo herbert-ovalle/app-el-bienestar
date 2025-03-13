@@ -28,18 +28,18 @@ class AppTheme {
           TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.bold),
       hintStyle: TextStyle(color: Colors.grey.shade500),
       filled: true,
-      fillColor:  Preferences.isDarkmode ? Colors.grey.shade600 : Colors.white,
+      fillColor:  Preferences.isDarkmode ? Colors.grey.shade700 : Colors.white,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.blue.shade300, width: 1),
+        borderSide: BorderSide(color: Preferences.isDarkmode ? Colors.white : Colors.blue.shade300, width: 1),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.blue.shade400, width: 1),
+        borderSide: BorderSide(color:Preferences.isDarkmode ? Colors.white : Colors.blue.shade400, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.blue.shade600, width: 1),
+        borderSide: BorderSide(color: Preferences.isDarkmode ? Colors.white : Colors.blue.shade600, width: 1),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -83,31 +83,20 @@ class ThemeProvider extends ChangeNotifier {
   static ThemeData setDarkmode() {
     return ThemeData(
       brightness: Brightness.dark, // Modo oscuro
-      scaffoldBackgroundColor: const Color.fromARGB(211, 27, 27, 27), // Fondo más oscuro
+      scaffoldBackgroundColor: const Color.fromARGB(255, 38, 38, 38), // Fondo más oscuro
       colorScheme: const ColorScheme.dark(
         //primary: Colors.blueGrey,
         secondary: Colors.teal,
         surface: Colors.black,
       ),
        appBarTheme: AppBarTheme(
-        backgroundColor: Colors.grey[900],
+        backgroundColor: Colors.grey[850],
         foregroundColor: Colors.white,
         centerTitle: true,
         titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
         iconTheme: IconThemeData(color: Colors.white),
       ),
     );
-    /*return ThemeData.dark().copyWith(
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        centerTitle: true,
-        titleTextStyle: TextStyle(color: Colors.white, fontSize: 25),
-        iconTheme: IconThemeData(color: Colors.white),
-      ),
-      scaffoldBackgroundColor: Colors.black,
-      textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white)),
-    );*/
   }
 
   void toggleTheme() {

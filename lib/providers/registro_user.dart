@@ -9,6 +9,10 @@ class DatosUsuarioProvider extends ChangeNotifier {
 
   Map<String, dynamic> get datosUsuario => _datosUsuario;
 
+  void limpiarDatos() {
+    _datosUsuario.clear();
+    notifyListeners();
+  }
 
   void setDato(String key, dynamic value) {
     _datosUsuario[key] = value;

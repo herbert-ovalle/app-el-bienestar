@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:app_bienestar/class/enviroment.dart';
-import 'package:app_bienestar/models/generales.model.dart';
+import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/services/servilocal.services.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:http/http.dart' as http;
@@ -10,12 +12,13 @@ import 'package:xml2json/xml2json.dart';
 
 class PeticionesExternas extends EnvitomentsQuery {
   final serviLocal = SaveLocal();
+
   Future<String> postTasaCambio() async {
     String tasaCam = await serviLocal.get("tasaC");
     if (tasaCam.isNotEmpty) {
       final gTasa = TasaCambioM.fromRawJson(tasaCam);
 
-      if (compararFechas(DateTime.parse(gTasa.fecha),DateTime.now())) {
+      if (compararFechas(DateTime.parse(gTasa.fecha), DateTime.now())) {
         return actualizarTasaCam();
       } else {
         return gTasa.tasaCambio;
@@ -95,11 +98,81 @@ class PeticionesExternas extends EnvitomentsQuery {
   }
 
   bool compararFechas(DateTime fecha1, DateTime fecha2) {
-
     DateTime soloFecha1 = DateTime(fecha1.year, fecha1.month, fecha1.day);
     DateTime soloFecha2 = DateTime(fecha2.year, fecha2.month, fecha2.day);
 
     return soloFecha1.isBefore(soloFecha2);
   }
 
+  Future<Map<String, String>> headesrss() async {
+    String token = await SaveLocal().get("token");
+
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+      'KeyUnique':
+          'b868632d51e071869c5e1686f9cef65e471b1f0e5cb0e859f7c885edc1f6a6641',
+      'AccessApp': 'movilAsoBien'
+    };
+  }
+
+  int tiempoRespuesta = 45;
+  Future<Respuesta> query(
+      {required String url,
+      Map<String, dynamic>? body,
+      String tipoPet = "post"}) async {
+    Respuesta respuesta;
+    var client = http.Client();
+
+    try {
+      http.Response res;
+      if (tipoPet == "post") {
+        res = await client
+            .post(Uri.http(rutaBaseAso, "$rutaBaseUrl$url"),
+                headers: await headesrss(),
+                body: utf8.encode(jsonEncode(body ?? {})))
+            .timeout(Duration(seconds: tiempoRespuesta));
+      } else {
+        res = await client
+            .get(Uri.http(rutaBaseAso, "$rutaBaseUrl$url"),
+                headers: await headesrss())
+            .timeout(Duration(seconds: tiempoRespuesta));
+      }
+
+      if (res.statusCode == 200) {
+        respuesta = Respuesta.fromRawJson(res.body);
+      } else {
+        respuesta = Respuesta(respuesta: "error", mensaje: res.body.toString());
+      }
+
+      return respuesta;
+    } on TimeoutException catch (_) {
+      return Respuesta(
+        respuesta: "error",
+        mensaje: "⏳ Error: Tiempo de conexión agotado (Timeout)",
+      );
+    } on SocketException catch (_) {
+      return Respuesta(
+        respuesta: "error",
+        mensaje: "🌐 Error: No hay conexión al servidor",
+      );
+    } catch (e) {
+      return Respuesta(respuesta: "error", mensaje: e.toString());
+    } finally {
+      client.close();
+    }
+  }
+
+  Future<Respuesta> catalogoIncial({bool soloPeticion = false}) async {
+    Respuesta res;
+    String catInicial = await serviLocal.get("catalogoLocal");
+    if (catInicial.isNotEmpty && !soloPeticion) {
+      res = Respuesta(
+          respuesta: "success", mensaje: "", datos: jsonDecode(catInicial));
+    } else {
+      res = await query(url: "catProductos", tipoPet: "get");
+      await serviLocal.save("catalogoLocal", jsonEncode(res.datos ?? []));
+    }
+    return res;
+  }
 }

@@ -7,8 +7,8 @@ class ReproductorMusic {
     return await platform.invokeMethod<bool>('isMusicPlaying') ?? false;
   }
 
-  Future<void> playMusic() async {
-    await platform.invokeMethod('playMusic');
+  Future<String> playMusic() async {
+    return await platform.invokeMethod('playMusic');
   }
 
   Future<void> pauseMusic() async {
@@ -25,5 +25,13 @@ class ReproductorMusic {
 
   Future<double> obtenerVolumen() async {
     return await platform.invokeMethod('obtenerVolumen');
+  }
+
+  Future<void> obtenerInternet() async {
+    await platform.invokeMethod('estadoInternet');
+  }
+
+  Future<void> showBankSnackBar(String message) async {
+    await platform.invokeMethod('showSnackBar', {"message": message});
   }
 }

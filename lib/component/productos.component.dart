@@ -1,14 +1,20 @@
+import 'dart:convert';
 import 'package:app_bienestar/class/preferences.theme.dart';
+import 'package:app_bienestar/component/fomulariosolicitud.component.dart';
+import 'package:app_bienestar/component/inforequisitos.component.dart';
+import 'package:app_bienestar/models/z_model.dart';
 import 'package:flutter/material.dart';
 
 class ProductosScreen extends StatelessWidget {
   final String tituloAppBar;
   final int tipo;
+  final List<ProductosCatalogo> prodCat;
 
   const ProductosScreen(
-    {super.key, 
-    required this.tituloAppBar, 
-    required this.tipo});
+      {super.key,
+      required this.tituloAppBar,
+      required this.tipo,
+      required this.prodCat});
 
   @override
   Widget build(BuildContext context) {
@@ -23,36 +29,59 @@ class ProductosScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
+            mainAxisSize: MainAxisSize.max,
             children: [
               Image(
-                image: AssetImage(Preferences.isDarkmode ? "assets/LOGO_BLANCO.png" : "assets/LOGO_AZUL.png"),
+                image: AssetImage(Preferences.isDarkmode
+                    ? "assets/LOGO_BLANCO.png"
+                    : "assets/LOGO_AZUL.png"),
                 height: 50,
               ),
-              TextButton(
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
+              if (prodCat.isNotEmpty)
+                TextButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                        WidgetStateProperty.all<Color>(Colors.blue),
+                  ),
+                  onPressed: () => showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      useSafeArea: false,
+                      builder: (BuildContext context) {
+                        return FormularioSolicitud(titulo: tituloAppBar,lstCatalogo: prodCat,tipo: tipo,);
+                      }),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.link,
+                        color: Colors.white,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text('Solicite $tituloAppBar',
+                          style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
                 ),
-                onPressed: () {},
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.link,
-                      color: Colors.white,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text('Solicite $tituloAppBar',
-                        style: TextStyle(color: Colors.white)),
-                  ],
-                ),
-              ),
               Expanded(
                 child: SingleChildScrollView(
-                  child: debolverProducto(tipo)
-                ),
+                    child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 4),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          gradient: Preferences.isDarkmode
+                              ? LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: <Color>[Colors.orange, Colors.red],
+                                  stops: <double>[0.0, 1.0],
+                                )
+                              : null,
+                        ),
+                        child: debolverProducto(tipo, prodCat))),
               ),
             ],
           ),
@@ -62,19 +91,29 @@ class ProductosScreen extends StatelessWidget {
   }
 }
 
-Widget debolverProducto(int tipo){
+Widget debolverProducto(int tipo, List<ProductosCatalogo> prodCat) {
+  if (prodCat.isNotEmpty) {
+    return Column(children: [
+      ...prodCat.map((e) => InformacionProducto(
+            titulo: e.subProducto,
+            descripcion: e.descripcion,
+            imagen: "assets/productos/${e.urlFotografia}",
+            lstRequisitos: e.requisitos,
+          ))
+    ]);
+  }
 
   switch (tipo) {
     case 0:
-        return AhorrosProductos();
+      return AhorrosProductos();
     case 1:
-        return PrestamosProductos();
+      return PrestamosProductos();
     case 2:
-        return SegurosProductos();
+      return SegurosProductos();
     case 3:
-        return RemesasProductos();
+      return RemesasProductos();
     default:
-        return Center(child: Text("No disponible"));
+      return Center(child: Text("No disponible"));
   }
 }
 
@@ -88,8 +127,9 @@ class RemesasProductos extends StatelessWidget {
     return Column(
       children: [
         InformacionProducto(
-            titulo: "Cobra tu remesa", 
-            descripcion: "Envía tus remesas a Guatemala y recíbelas por medio de Cooperativa El Bienestar! Sin cobro de comisión y de manera segura.", 
+            titulo: "Cobra tu remesa",
+            descripcion:
+                "Envía tus remesas a Guatemala y recíbelas por medio de Cooperativa El Bienestar! Sin cobro de comisión y de manera segura.",
             imagen: "assets/productos/remesas/Remesa.png"),
         InformacionProducto(
             titulo: "Tu Remesa Dirigida",
@@ -97,8 +137,11 @@ class RemesasProductos extends StatelessWidget {
                 "Este servicio facilita el envío de dinero de tus seres queridos desde el extranjero hacia una cuenta de Ahorro Disponible de una manera directa, fácil y segura.",
             imagen: "assets/productos/remesas/Remesa-dirigida.png"),
         SizedBox(height: 20),
-        Text("Remesadoras Aliadas",style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        Image(image: AssetImage("assets/productos/remesas/Remesadoras-1280x276.png")),
+        Text("Remesadoras Aliadas",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        Image(
+            image: AssetImage(
+                "assets/productos/remesas/Remesadoras-1280x276.png")),
         SizedBox(height: 40)
       ],
     );
@@ -115,9 +158,11 @@ class SegurosProductos extends StatelessWidget {
     return Column(
       children: [
         InformacionProducto(
-          titulo: 'Seguro de Vehículos', 
-          descripcion: 'Asegura tu tranquilidad con nuestra cobertura completa para vehículos. Nuestro seguro ofrece respaldo contra accidentes, vuelcos, colisiones y robo, además de protección para ocupantes ante cualquier eventualidad.', 
-          imagen: 'assets/productos/seguros/manejo-seguro.png',),
+          titulo: 'Seguro de Vehículos',
+          descripcion:
+              'Asegura tu tranquilidad con nuestra cobertura completa para vehículos. Nuestro seguro ofrece respaldo contra accidentes, vuelcos, colisiones y robo, además de protección para ocupantes ante cualquier eventualidad.',
+          imagen: 'assets/productos/seguros/manejo-seguro.png',
+        ),
         InformacionProducto(
           titulo: 'Seguro Infanto Juvenil',
           descripcion:
@@ -175,9 +220,10 @@ class PrestamosProductos extends StatelessWidget {
     return Column(
       children: [
         InformacionProducto(
-          titulo: 'Micro-Crédito',
-          descripcion: "Diseñado para fortalecer tu capital de trabajo, ampliación de negocio o emprendimiento. Pocos requisitos, sin fiador y cuotas accesibles.",
-          imagen: "assets/productos/creditos/microcreditos.png"),
+            titulo: 'Micro-Crédito',
+            descripcion:
+                "Diseñado para fortalecer tu capital de trabajo, ampliación de negocio o emprendimiento. Pocos requisitos, sin fiador y cuotas accesibles.",
+            imagen: "assets/productos/creditos/microcreditos.png"),
         InformacionProducto(
             titulo: 'Crédito Mi Consumo',
             descripcion:
@@ -203,7 +249,7 @@ class PrestamosProductos extends StatelessWidget {
             descripcion:
                 "Te brindamos el capital de trabajo para la compra de semillas, insumos y materia prima, así como para la adquisición de activos fijos, incluyendo terrenos productivos, ganado, instalaciones y equipo necesario para el crecimiento de tu negocio agrícola. Con plazos adaptados al uso del crédito, intereses sobre saldos y cuotas fijas.",
             imagen: "assets/productos/creditos/agricultura.png"),
-         InformacionProducto(
+        InformacionProducto(
             titulo: 'Crédito Grupal',
             descripcion:
                 "Apoyamos a mujeres emprendedoras ofreciéndoles capital de trabajo para impulsar sus negocios, ya sean formales o informales. Financiamiento hasta Q.30,000.00 con grupos de hasta 5 integrantes, brindando una oportunidad accesible para crecer juntas y alcanzar sus metas.",
@@ -221,80 +267,101 @@ class AhorrosProductos extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [ 
+      children: [
         InformacionProducto(
-          titulo: 'Ahorro Disponible',
-          descripcion: "Ofrece un manejo seguro y fácil sobre tus ahorros, excelente tasa de interés y acceso a tu dinero en cualquier momento. Incluye tarjeta de débito VISA internacional sin costo de membresía, seguro contra fraudes y muchos beneficios más.",
-          imagen: "assets/productos/ahorros/disponible.png"),
-    
+            titulo: 'Ahorro Disponible',
+            descripcion:
+                "Ofrece un manejo seguro y fácil sobre tus ahorros, excelente tasa de interés y acceso a tu dinero en cualquier momento. Incluye tarjeta de débito VISA internacional sin costo de membresía, seguro contra fraudes y muchos beneficios más.",
+            imagen: "assets/productos/ahorros/disponible.png"),
         InformacionProducto(
             titulo: 'Ahorro Programado',
             descripcion:
                 "Ideal para mayores de edad que buscan hacer crecer su dinero. Con depósitos mensuales, esta cuenta te ofrece intereses cada mes, ayudándote a alcanzar tus metas en plazos de 1 a 5 años, utiliza el débito automático para mantener tus ahorros al día.",
             imagen: "assets/productos/ahorros/programado.png"),
-    
         InformacionProducto(
             titulo: 'Ahorro a Plazo Fijo',
             descripcion:
                 "Disfruta de una inversión confiable que maximiza tus ahorros sin riesgos y con grandes beneficios totalmente gratis; elige el plazo que mejor se adapte a tus metas: 90, 180, 365, 540 o 730 días. Respaldado por nuestra solidez financiera de 63 años.",
             imagen: "assets/productos/ahorros/plazo_fijo.png"),
-        
         InformacionProducto(
             titulo: 'Aportaciones',
             descripcion:
                 "Conviértete en asociado y disfruta de los beneficios de la Cooperativa. Las aportaciones te otorgan el derecho de participar en la toma de decisiones en la asamblea anual ordinaria. Obtén una atractiva tasa de interés desde el primer día, con intereses acumulados anualmente.",
             imagen: "assets/productos/ahorros/aportaciones.png"),
-    
         InformacionProducto(
             titulo: 'Cuenta Joven',
             descripcion:
                 "Una cuenta para jóvenes de 13 a 17 años, para crear el buen hábito de ahorrar. Los ahorros generan ganancias desde el primer día y se acumulan anualmente. Empieza a construir tu futuro, a organizar tus finanzas y a alcanzar tus metas.",
             imagen: "assets/productos/ahorros/joven.png"),
-    
         InformacionProducto(
             titulo: 'Peque Cuenta',
             descripcion:
                 "Una cuenta diseñada para niñas y niños de 0 a 13 años, enséñales a construir un gran futuro descubriendo la mejor manera de ahorrar y obteniendo beneficios exclusivos como la participación en la asamblea infantil, la escuelita del bienestarcito y programas educativos.",
             imagen: "assets/productos/ahorros/peque-cuenta.png"),
-      
       ],
     );
   }
 }
 
 class InformacionProducto extends StatelessWidget {
-  
   final String titulo;
   final String descripcion;
   final String imagen;
+  final dynamic lstRequisitos;
 
   const InformacionProducto({
-      super.key, 
-      required this.titulo, 
-      required this.descripcion, 
-      required this.imagen,
+    super.key,
+    required this.titulo,
+    required this.descripcion,
+    required this.imagen,
+    this.lstRequisitos,
   });
 
   @override
   Widget build(BuildContext context) {
+    List<dynamic> listValores = [];
+    if (lstRequisitos != null) {
+      Map<String, dynamic> valores = jsonDecode(lstRequisitos);
+      listValores = valores.values.toList()[0];
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Divider(),
         Text(titulo.toUpperCase(),
-            style: TextStyle(fontWeight: FontWeight.bold, 
-                fontSize: 22, 
-                )),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            )),
         Divider(),
         Text(
           descripcion,
           textAlign: TextAlign.justify,
           style: TextStyle(fontSize: 16),
         ),
+        if (listValores.isNotEmpty)
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                mostrarRequisitos(context, listValores, titulo);
+              },
+              icon: Icon(Icons.info, color: Colors.white),
+              label: Text("Requisitos", style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[600], // Color del botón
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                textStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10), // Bordes redondeados
+                ),
+              ),
+            ),
+          ),
         Image(
           image: AssetImage(imagen),
         ),
-        SizedBox(height: 10),
       ],
     );
   }
