@@ -9,4 +9,10 @@ class DatosTasaCambio extends ChangeNotifier {
 
   String get datosUsuario => _tasaCambio;  
 
+  void limpiarDatos() {
+    //_datosUsuario.clear();
+    notifyListeners();
+  }
+
+
 }

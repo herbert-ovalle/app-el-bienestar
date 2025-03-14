@@ -6,7 +6,8 @@ class AppTheme {
       {Widget? suffixIcon,
       required String label,
       required String hint,
-      required bool requerido}) {
+      required bool requerido,
+      OutlineInputBorder? disabledBord}) {
     return InputDecoration(
       label: RichText(
         text: TextSpan(
@@ -18,6 +19,12 @@ class AppTheme {
                 text: ' *',
                 style:
                     TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+            if(!requerido)
+              TextSpan(
+                text :' (opcional)',
+                style:
+                    TextStyle(color: Preferences.isDarkmode ? null : Colors.black),
               ),
           ],
         ),
@@ -49,6 +56,7 @@ class AppTheme {
         borderRadius: BorderRadius.circular(8),
         borderSide: BorderSide(color: Colors.red.shade600, width: 1),
       ),
+      disabledBorder: disabledBord,
       contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
     );
   }

@@ -9,6 +9,7 @@ class RegistroUsuario {
   final String? direccion;
   final String? usuario;
   final String contrasena;
+  final bool? esAsociado;
 
   RegistroUsuario({
     required this.nombres,
@@ -18,6 +19,7 @@ class RegistroUsuario {
     this.direccion,
     this.usuario,
     required this.contrasena,
+    this.esAsociado,
   });
 
   factory RegistroUsuario.fromRawJson(String str) =>
@@ -34,6 +36,7 @@ class RegistroUsuario {
         direccion: json["direccion"] ?? "",
         usuario: json["usuario"] ?? json["dpi"].replaceAll(" ", ""),
         contrasena: encriptarContrasena(json["contrasena"] ?? ""),
+        esAsociado: json["esAsociado"] ?? true
       );
 
   Map<String, dynamic> toJson() => {
@@ -44,9 +47,9 @@ class RegistroUsuario {
         "direccion": direccion,
         "usuario": usuario,
         "contrasena": contrasena,
+        "esAsociado": esAsociado
       };
 }
-
 
 class LoginModel {
   final String usuario;

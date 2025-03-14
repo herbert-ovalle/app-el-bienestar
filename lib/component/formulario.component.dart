@@ -4,6 +4,7 @@ import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/providers/guardar_usuario.dart';
 import 'package:app_bienestar/providers/registro_user.dart';
 import 'package:app_bienestar/screen/login.screen.dart';
+import 'package:app_bienestar/services/z_service.dart';
 import 'package:app_bienestar/themes/tema_app.dart';
 import 'package:async_button_builder/async_button_builder.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,9 @@ import 'package:provider/provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class FormularioComponent extends StatefulWidget {
-  const FormularioComponent({super.key});
+  const FormularioComponent({super.key, this.infoIni});
 
+  final CargarInfoPre? infoIni;
   @override
   State<FormularioComponent> createState() => _FormularioComponentState();
 }
@@ -27,10 +29,25 @@ class _FormularioComponentState extends State<FormularioComponent> {
   final TextEditingController _telefonoController = TextEditingController();
   final TextEditingController _direccionController = TextEditingController();
   final TextEditingController _contrasenaController = TextEditingController();
+  bool mostrarTelAso = false;
 
   final FocusNode _dpiFocus = FocusNode();
   final FocusNode _telefonoFocus = FocusNode();
   final FocusNode _nombreFocus = FocusNode();
+
+  @override
+  void initState() {
+    Future.microtask(() {
+      if (widget.infoIni != null) {
+        mostrarTelAso = true;
+        _dpiController.text = widget.infoIni!.dpi.toString();
+        _nombreController.text = widget.infoIni!.nombres;
+        _correoController.text = widget.infoIni!.correoElectronico;
+      }
+    });
+
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -56,101 +73,149 @@ class _FormularioComponentState extends State<FormularioComponent> {
       appBar: AppBar(title: Text("Registre sus datos")),
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: SingleChildScrollView(
-            child: Wrap(
-              spacing: 5.0,
-              runSpacing: 5.0,
-              children: [
-                // Nombre
-                InputForm(
-                    name: "dpi",
-                    controller: _dpiController,
-                    label: "DPI",
-                    hint: "Ingrese su CUI",
-                    keyboardType: TextInputType.number,
-                    campoObli: true,
-                    autoFocus: true,
-                    focusNode: _dpiFocus,
-                    nextFocus: _telefonoFocus,
-                    formatters: [
-                      MaskTextInputFormatter(
-                          mask: '#### ##### ####',
-                          type: MaskAutoCompletionType.lazy)
-                    ],
-                    validar: Validar(maxLength: 15, minLength: 15)),
+        child: Consumer<DatosUsuarioProvider>(
+            builder: (BuildContext context, value, Widget? child) {
+          print(value.lastFunctionCalled);
+          if (value.lastFunctionCalled == "limpiarTodo") {
+            _telefonoController.clear();
+            _nombreController.clear();
+            _correoController.clear();
+            _direccionController.clear();
+            _contrasenaController.clear();
+            mostrarTelAso = false;
+          }
+          return Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: SingleChildScrollView(
+              child: Wrap(
+                spacing: 5.0,
+                runSpacing: 5.0,
+                children: [
+                  // Nombre
+                  InputForm(
+                      name: "dpi",
+                      controller: _dpiController,
+                      label: "DPI",
+                      hint: "Ingrese su CUI",
+                      keyboardType: TextInputType.number,
+                      campoObli: true,
+                      autoFocus: true,
+                      focusNode: _dpiFocus,
+                      nextFocus: _telefonoFocus,
+                      suffixIcon: IconButton(
+                          onPressed: () async {
+                            if (_dpiController.text.length == 15) {
+                              await validarCUIngresado(
+                                  context, _dpiController.text);
+                            } else {
+                              await ReproductorMusic()
+                                  .showBankSnackBar("Dígite su CUI");
+                            }
+                          },
+                          icon: Icon(Icons.search)),
+                      formatters: [
+                        MaskTextInputFormatter(
+                            mask: '#### ##### ####',
+                            type: MaskAutoCompletionType.lazy)
+                      ],
+                      validar: Validar(maxLength: 15, minLength: 15)),
 
-                InputForm(
-                    name: "telefono",
-                    controller: _telefonoController,
-                    label: "Teléfono",
-                    hint: "Ingrese su teléfono",
-                    keyboardType: TextInputType.phone,
-                    focusNode: _telefonoFocus,
-                    nextFocus: _nombreFocus,
-                    campoObli: true,
-                    formatters: [
-                      MaskTextInputFormatter(
-                          mask: '#### ####',
-                          filter: {"#": RegExp(r'[0-9]')},
-                          type: MaskAutoCompletionType.lazy)
-                    ],
-                    validar: Validar(maxLength: 9, minLength: 9)),
+                  if (mostrarTelAso)
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      alignment: AlignmentDirectional.center,
+                      width: MediaQuery.of(context).size.height,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Colors.purple), // Cambia el color del borde
+                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.grey[200], // Fondo gris claro
+                      ),
+                      child: Text(
+                        "Teléfono: ${widget.infoIni!.telefono}",
+                        style: TextStyle(color: Colors.purple, fontSize: 16),
+                      ),
+                    ),
+                  InputForm(
+                      name: "telefono",
+                      controller: _telefonoController,
+                      label: !mostrarTelAso ? 'Teléfono' : 'Confirmar teléfono',
+                      hint: "Ingrese su teléfono",
+                      keyboardType: TextInputType.phone,
+                      focusNode: _telefonoFocus,
+                      nextFocus: _nombreFocus,
+                      campoObli: true,
+                      formatters: [
+                        MaskTextInputFormatter(
+                            mask: '#### ####',
+                            filter: {"#": RegExp(r'[0-9]')},
+                            type: MaskAutoCompletionType.lazy)
+                      ],
+                      validar: Validar(maxLength: 9, minLength: 9)),
 
-                InputForm(
-                    name: "nombres",
-                    controller: _nombreController,
-                    label: "Nombre",
-                    hint: "Ingrese su nombre completo",
-                    focusNode: _nombreFocus,
-                    campoObli: true,
-                    validar: Validar(maxLength: 60, minLength: 12)),
+                  InputForm(
+                      name: "nombres",
+                      controller: _nombreController,
+                      label: "Nombre",
+                      hint: "Ingrese su nombre completo",
+                      focusNode: _nombreFocus,
+                      campoObli: true,
+                      validar: Validar(maxLength: 60, minLength: 12)),
 
-                // Contraseña
-                _buildPasswordField(),
+                  if (!mostrarTelAso)
+                    InputForm(
+                      name: "correo",
+                      controller: _correoController,
+                      label: "Correo",
+                      hint: "Ingrese un correo válido",
+                      autoFocus: true,
+                      validator: (value) {
+                        /*if (value == null || value.isEmpty) {
+                            return "Correo requerido";
+                          }*/
+                        if (value != null &&
+                            value.isNotEmpty &&
+                            !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                          return "Correo inválido";
+                        }
+                        return null;
+                      },
+                      validar: Validar(maxLength: 100),
+                    ),
 
-                InputForm(
-                  name: "correo",
-                  controller: _correoController,
-                  label: "Correo",
-                  hint: "Ingrese un correo válido",
-                  autoFocus: true,
-                  validator: (value) {
-                    /*if (value == null || value.isEmpty) {
-                          return "Correo requerido";
-                        }*/
-                    if (value != null &&
-                        value.isNotEmpty &&
-                        !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                      return "Correo inválido";
-                    }
-                    return null;
-                  },
-                  validar: Validar(maxLength: 100),
-                ),
+                  // Dirección
+                  InputForm(
+                      name: "direccion",
+                      controller: _direccionController,
+                      label: "Dirección",
+                      hint: "Ingrese su dirección"),
 
-                // Dirección
-                InputForm(
-                    name: "direccion",
-                    controller: _direccionController,
-                    label: "Dirección",
-                    hint: "Ingrese su dirección"),
+                  // Contraseña
+                  _buildPasswordField(),
 
-                // Botón de envío
-                _buildSubmitButton(context),
-              ],
+                  // Botón de envío
+                  _buildSubmitButton(
+                      context,
+                      widget.infoIni ??
+                          CargarInfoPre(
+                              nombres: "",
+                              telefono: "",
+                              correoElectronico: "",
+                              dpi: "",
+                              esAsociado: true)),
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }
 
   /// Campo de contraseña con botón de "ver contraseña"
   Widget _buildPasswordField() {
-    final dato = Provider.of<DatosUsuarioProvider>(context);
+    final dato = Provider.of<DatosUsuarioProvider>(context, listen: false);
     return SizedBox(
       width: MediaQuery.of(context).size.width > 600 ? 300 : double.infinity,
       child: TextFormField(
@@ -164,6 +229,7 @@ class _FormularioComponentState extends State<FormularioComponent> {
           suffixIcon: IconButton(
             icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
             onPressed: () {
+              dato.lastFunctionCalled = "ninguno";
               setState(() {
                 _showPassword = !_showPassword;
               });
@@ -185,7 +251,7 @@ class _FormularioComponentState extends State<FormularioComponent> {
   }
 
   /// Botón de envío del formulario
-  Widget _buildSubmitButton(BuildContext context) {
+  Widget _buildSubmitButton(BuildContext context, CargarInfoPre infoAsociado) {
     final datoUser = Provider.of<DatosUsuarioProvider>(context);
     return SizedBox(
       width: double.infinity,
@@ -194,7 +260,9 @@ class _FormularioComponentState extends State<FormularioComponent> {
           if (_formKey.currentState!.validate()) {
             FocusScope.of(context).unfocus();
             FocusManager.instance.primaryFocus?.unfocus();
-            final datUser = RegistroUsuario.fromJson(datoUser.datosUsuario);
+            final datUser = RegistroUsuario.fromJson(
+                {...infoAsociado.toJson(), ...datoUser.datosUsuario});
+
             Respuesta res = await showLoadingDialog(
                 context, UsuarioAsociadoN().guardarAsociado(datUser.toJson()));
 

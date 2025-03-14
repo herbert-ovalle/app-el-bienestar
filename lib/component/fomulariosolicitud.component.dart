@@ -1,3 +1,4 @@
+import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/component/formgeneral.component.dart';
 import 'package:app_bienestar/component/spiner-asincrono.component.dart';
 import 'package:app_bienestar/models/z_model.dart';
@@ -40,7 +41,7 @@ class _FormularioSolicitudState extends State<FormularioSolicitud> {
       child: Container(
         width: MediaQuery.of(context).size.width * 0.95,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Preferences.isDarkmode ? Colors.grey[800] : Colors.white,
           borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.all(20),
@@ -57,7 +58,7 @@ class _FormularioSolicitudState extends State<FormularioSolicitud> {
                 ),
                 const SizedBox(height: 15),
                 InputForm(
-                    name: "cui",
+                    name: "dpi",
                     controller: _cuiController,
                     focusNode: _cuiFocus,
                     label: "DPI",
@@ -65,6 +66,7 @@ class _FormularioSolicitudState extends State<FormularioSolicitud> {
                     keyboardType: TextInputType.number,
                     campoObli: true,
                     autoFocus: true,
+                    suffixIcon: Icon(Icons.search),
                     formatters: [
                       MaskTextInputFormatter(
                           mask: '#### ##### ####',

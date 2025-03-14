@@ -1,4 +1,5 @@
 // Método para mostrar los requisitos en un AlertDialog
+import 'package:app_bienestar/class/preferences.theme.dart';
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +28,7 @@ void mostrarRequisitos(
           color: Colors.black12,
           width: MediaQuery.of(context).size.width * 0.94,
           child: Card(
-            color: Colors.white,
+            color: Preferences.isDarkmode ? Colors.grey[700] : Colors.white,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 4, // Sombra para mejor apariencia

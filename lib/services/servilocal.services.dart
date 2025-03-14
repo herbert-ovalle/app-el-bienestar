@@ -23,4 +23,10 @@ class SaveLocal {
   Future<void> delete(String key) async {
     return await storage.delete(key: key);
   }
+
+  Future<void> deleteSession() async {
+    await delete("token");
+    await delete("idSession");
+    await delete("user");   
+  }
 }

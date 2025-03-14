@@ -71,7 +71,7 @@ class _BankLoginScreenState extends State<BankLoginScreen>
             mensaje:
                 "Ingrese el código de acceso enviado anteriormente a su teléfono");
       } else {
-        await SaveLocal().deleteAll();
+        await SaveLocal().deleteSession();
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -334,7 +334,7 @@ class _BankLoginScreenState extends State<BankLoginScreen>
 
       Respuesta res;
 
-      await SaveLocal().deleteAll();
+      await SaveLocal().deleteSession();
       res = await showLoadingDialog(
           // ignore: use_build_context_synchronously
           context,

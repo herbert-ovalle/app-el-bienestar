@@ -76,7 +76,7 @@ class ProductosScreen extends StatelessWidget {
                               ? LinearGradient(
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter,
-                                  colors: <Color>[Colors.orange, Colors.red],
+                                  colors: <Color>[const Color.fromARGB(255, 66, 66, 66), Color.fromARGB(255, 94, 94, 94)],
                                   stops: <double>[0.0, 1.0],
                                 )
                               : null,

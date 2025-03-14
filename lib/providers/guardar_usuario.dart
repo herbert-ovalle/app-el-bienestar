@@ -1,6 +1,5 @@
 import 'package:app_bienestar/models/z_model.dart';
 import 'package:app_bienestar/services/z_service.dart';
-
 import 'package:flutter/material.dart';
 
 class UsuarioAsociadoN extends ChangeNotifier {

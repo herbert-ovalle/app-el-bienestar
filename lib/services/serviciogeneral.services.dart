@@ -1,7 +1,14 @@
 import 'dart:convert';
+import 'package:app_bienestar/component/z_component.dart';
+import 'package:app_bienestar/models/z_model.dart';
+import 'package:app_bienestar/providers/guardar_usuario.dart';
+import 'package:app_bienestar/providers/registro_user.dart';
+import 'package:app_bienestar/screen/login.screen.dart';
 import 'package:crypto/crypto.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 String encriptarContrasena(String valor) {
   var key = utf8.encode('p@ssw0rd_anhs');
@@ -40,7 +47,6 @@ Map<String, dynamic> decodeToken(String token) {
 }
 
 String formatoMoneda(double cantidad) {
-
   try {
     final formato = NumberFormat.currency(symbol: 'Q ');
     return formato.format(cantidad);
@@ -54,5 +60,46 @@ int valEntero(tel) {
     return tel;
   } else {
     return int.parse(tel.replaceAll(" ", ""));
+  }
+}
+
+Future<void> validarCUIngresado(BuildContext context, value) async {
+  final datUserPro = Provider.of<DatosUsuarioProvider>(context, listen: false);
+  final rsdpi =
+      await showLoadingDialog(context, UsuarioAsociadoN().validarDPI(value));
+      
+  if (rsdpi.respuesta == "success") {
+    final datosAsociado = CargarInfoPre.fromJson(rsdpi.datos![0]);
+    datUserPro.lastFunctionCalled = "ninguna";
+    if (datosAsociado.dpi.isEmpty) {
+      Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
+          context,
+          MaterialPageRoute(
+              builder: (context) => FormularioComponent(
+                    infoIni: CargarInfoPre.fromJson({
+                      ...datosAsociado.toJson(),
+                      ...{'dpi': value}
+                    }),
+                  )));
+    } else {
+      Navigator.push(
+          // ignore: use_build_context_synchronously
+          context,
+          MaterialPageRoute(
+              builder: (context) => BankLoginScreen(
+                    dpiI: value,
+                  )));
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ya tiene usuario ingrese su contraseña")),
+      );
+    }
+  } else {
+    datUserPro.limpiarDatos();
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(rsdpi.mensaje)),
+    );
   }
 }

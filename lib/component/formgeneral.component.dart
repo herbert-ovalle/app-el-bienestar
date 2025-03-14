@@ -1,30 +1,29 @@
-import 'package:app_bienestar/component/spiner-asincrono.component.dart';
 import 'package:app_bienestar/models/validador.model.dart';
-import 'package:app_bienestar/providers/guardar_usuario.dart';
 import 'package:app_bienestar/providers/registro_user.dart';
-import 'package:app_bienestar/screen/login.screen.dart';
 import 'package:app_bienestar/themes/tema_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../services/z_service.dart';
+
 class InputForm extends StatefulWidget {
-  const InputForm({
-    super.key,
-    required this.controller,
-    required this.label,
-    required this.hint,
-    required this.name,
-    this.keyboardType = TextInputType.text,
-    this.validator,
-    this.focusNode,
-    this.nextFocus,
-    this.autoFocus = false,
-    this.formatters,
-    this.campoObli = false,
-    this.validar,
-    this.maxlines = 1,
-  });
+  const InputForm(
+      {super.key,
+      required this.controller,
+      required this.label,
+      required this.hint,
+      required this.name,
+      this.keyboardType = TextInputType.text,
+      this.validator,
+      this.focusNode,
+      this.nextFocus,
+      this.autoFocus = false,
+      this.formatters,
+      this.campoObli = false,
+      this.validar,
+      this.maxlines = 1,
+      this.suffixIcon});
 
   final String name;
   final TextEditingController controller;
@@ -39,6 +38,7 @@ class InputForm extends StatefulWidget {
   final bool campoObli;
   final Validar? validar;
   final int? maxlines;
+  final Widget? suffixIcon;
 
   @override
   State<InputForm> createState() => _InputFormState();
@@ -83,6 +83,7 @@ class _InputFormState extends State<InputForm> {
             ? TextInputAction.next
             : TextInputAction.done,
         decoration: AppTheme.inputDecoration(
+            suffixIcon: widget.suffixIcon,
             label: widget.label,
             hint: widget.hint,
             requerido: widget.campoObli),
@@ -94,28 +95,7 @@ class _InputFormState extends State<InputForm> {
         },
         onChanged: (value) async {
           if (widget.name == "dpi" && value.length == 15) {
-            final rsdpi = await showLoadingDialog(
-                context, UsuarioAsociadoN().validarDPI(value));
-
-            if (rsdpi.respuesta == "success") {
-              Navigator.push(
-                  // ignore: use_build_context_synchronously
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BankLoginScreen(
-                            dpiI: value,
-                          )));
-              // ignore: use_build_context_synchronously
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content: Text("Ya tiene usuario ingrese su contraseña")),
-              );
-            } else {
-              // ignore: use_build_context_synchronously
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(rsdpi.mensaje)),
-              );
-            }
+            await validarCUIngresado(context, value);
           }
           datoUser.datosUsuario[widget.name] = value;
         },

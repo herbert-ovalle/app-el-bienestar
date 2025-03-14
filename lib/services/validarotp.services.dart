@@ -73,7 +73,7 @@ void mostrarDialogoOTP(BuildContext context,
                               ElevatedButton(
                                 onPressed: () async {
                                   if (!isLoading) {
-                                    await SaveLocal().deleteAll();
+                                    await SaveLocal().deleteSession();
                                     // ignore: use_build_context_synchronously
                                     Navigator.pop(dialogContext);
                                   }

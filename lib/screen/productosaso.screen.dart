@@ -108,7 +108,7 @@ class _InformacionAsociadoState extends State<InformacionAsociado> {
                                 final res = snapshot.data!;
                                 if (res.respuesta != "success") {
                                   if (res.eliSess == 1) {
-                                    SaveLocal().deleteAll().then((_) => {});
+                                    SaveLocal().deleteSession().then((_) => {});
                                   }
 
                                   return Center(
